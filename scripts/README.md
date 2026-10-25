@@ -22,7 +22,7 @@
 
 ## P0 组件 · iPhone Duo 适配规范 → 飞书文档
 
-内容来自 Figma 节点 `1:8849`，已整理在 `specs/iphone-duo-p0.json`（9 个组件）。脚本把内容**追加到文档末尾**：每个形态一个两栏分栏（左说明、右示意图），示意图最高 380px；Specs 用飞书原生表格，核心规则用高亮块。
+内容来自 Figma 节点 `1:8849`，已整理在 `specs/iphone-duo-p0.json`（9 个组件）。脚本把内容**追加到文档末尾**：相邻两个竖屏形态合成一行（两段说明叠在左栏，两张示意图并排），横屏和多图拼版每个形态一行，示意图最高 380px；表格用飞书原生表格，核心规则用高亮块。加 `--no-specs` 不写 Specs 表。
 
 1. **示意图**：按 JSON 里每个 `config` 的 `node`，用 Figma MCP 的 `get_screenshot` 导出形态 frame（1×），裁掉左侧 Spec 文字区，存成 `shots/duo-p0/<node>.png`（如 `1_8858.png`）。
 2. **写入**：默认通过飞书 CLI 以你本人身份写入，你对文档有编辑权限即可。
@@ -32,7 +32,7 @@
    lark-cli auth login --domain docs,drive                 # 浏览器里确认授权
    python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --dry-run          # 只打印版式
    python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --until Navigation # 总览 + 第一个组件
-   python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --from Sheet       # 其余组件
+   python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --from Sheet --no-specs  # 其余组件，不写 Specs
    ```
    每段写完会回读校验；已创建的块 ID 记在 `shots/duo-p0/progress.json`，中途失败可以用 `--from` 续写。
    不用 CLI 时可加 `--client app`，改用自建应用凭证（`LARK_APP_ID` / `LARK_APP_SECRET` / `LARK_DOMAIN`，应用需加为文档协作者）。

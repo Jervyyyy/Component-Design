@@ -134,40 +134,76 @@ def png_size(path):
     return struct.unpack(">II", head[16:24])
 
 
-def image_layout(png_w, png_h, opts):
-    """Display size and grid ratio for a mockup: as tall as max_img_h unless that would
-    make it wider than max_img_ratio percent of the page."""
-    aspect = png_w / png_h
-    max_w = opts.page_width * opts.max_img_ratio / 100 - COL_PAD
-    w = min(opts.max_img_h * aspect, max_w)
-    ratio = min(opts.max_img_ratio, math.ceil((w + COL_PAD) * 100 / opts.page_width))
-    return round(w), round(w / aspect), ratio
-
-
-def config_grid(block, image_dir, opts):
+def mockup(block, image_dir):
     path = os.path.join(image_dir, block["node"].replace(":", "_") + ".png")
-    w, h, img_ratio = image_layout(*png_size(path), opts)
+    w, h = png_size(path)
+    return path, w / h
+
+
+def row_layout(aspects, text_min, opts):
+    """Shared display height and grid ratios for mockups placed side by side after a text
+    column: as tall as max_img_h unless the images would leave the text column less than
+    text_min percent of the page."""
+    room = opts.page_width * (100 - text_min) / 100 - COL_PAD * len(aspects)
+    h = min(opts.max_img_h, room / sum(aspects))
+    sizes = [(round(h * a), round(h)) for a in aspects]
+    ratios = [math.ceil((w + COL_PAD) * 100 / opts.page_width) for w, _ in sizes]
+    return sizes, [100 - sum(ratios)] + ratios
+
+
+def config_text(block):
     text = [heading(4, block["title"])]
     if block.get("flag"):
         text.append(text_block([run(block["flag"], color=ORANGE)]))
     text.append(text_block([run(block["size"], color=GRAY)]))
-    text += spec_lines(block["lines"])
-    image = {"block_type": BLOCK_IMAGE, "image": {}, "_file": path, "_size": (w, h)}
-    return {"block_type": BLOCK_GRID, "grid": {"column_size": 2},
-            "children": [
-                {"block_type": BLOCK_GRID_COLUMN, "grid_column": {"width_ratio": 100 - img_ratio},
-                 "children": text},
-                {"block_type": BLOCK_GRID_COLUMN, "grid_column": {"width_ratio": img_ratio},
-                 "children": [image]},
-            ]}
+    return text + spec_lines(block["lines"])
+
+
+def config_row(blocks, image_dir, opts, text_min):
+    """One grid: the configurations' texts stacked in the first column, then one column
+    per mockup."""
+    shots = [mockup(b, image_dir) for b in blocks]
+    sizes, ratios = row_layout([a for _, a in shots], text_min, opts)
+    columns = [[n for b in blocks for n in config_text(b)]]
+    columns += [[{"block_type": BLOCK_IMAGE, "image": {}, "_file": path, "_size": size}]
+                for (path, _), size in zip(shots, sizes)]
+    return {"block_type": BLOCK_GRID, "grid": {"column_size": len(columns)},
+            "children": [{"block_type": BLOCK_GRID_COLUMN, "grid_column": {"width_ratio": r},
+                          "children": c} for r, c in zip(ratios, columns)]}
+
+
+def config_rows(blocks, image_dir, opts):
+    """Pair neighbouring configurations into one row when both mockups still get at least
+    pair_min_h px of height next to the shared text column (in practice: two portrait
+    screens); everything else gets a row of its own."""
+    rows, i = [], 0
+    while i < len(blocks):
+        pair = blocks[i:i + 2]
+        if len(pair) == 2:
+            sizes, _ = row_layout([mockup(b, image_dir)[1] for b in pair], opts.pair_text_ratio, opts)
+            if sizes[0][1] >= opts.pair_min_h:
+                rows.append(config_row(pair, image_dir, opts, opts.pair_text_ratio))
+                i += 2
+                continue
+        rows.append(config_row(blocks[i:i + 1], image_dir, opts, 100 - opts.max_img_ratio))
+        i += 1
+    return rows
 
 
 def component_nodes(comp, image_dir, opts):
     """Top-level blocks for one component, grouped: each group is one API call."""
     groups = [[heading(1, f"{comp['name']} {comp['cn']}"),
                text_block([run(comp["meta"], color=GRAY)])]]
-    for b in comp["blocks"]:
+    configs, skipping = [], False
+    for b in comp["blocks"] + [{"type": "end"}]:
         t = b["type"]
+        if t != "config" and configs:
+            groups += [[row] for row in config_rows(configs, image_dir, opts)]
+            configs = []
+        if t in ("h2", "h3"):
+            skipping = opts.no_specs and b["text"].startswith("Specs")
+        if skipping or t == "end":
+            continue
         if t in ("h2", "h3"):
             simple = [heading(int(t[1]), b["text"])]
         elif t == "p":
@@ -178,7 +214,7 @@ def component_nodes(comp, image_dir, opts):
             groups.append([callout(b["title"], b["items"])])
             continue
         elif t == "config":
-            groups.append([config_grid(b, image_dir, opts)])
+            configs.append(b)
             continue
         elif t == "table":
             groups.append([table(b["rows"], b["widths"], opts.page_width)])
@@ -222,10 +258,11 @@ def describe(node, indent=""):
         return [f"{indent}{name:<7} {content[:60]}"]
     if bt == BLOCK_GRID:
         ratios = [c["grid_column"]["width_ratio"] for c in node["children"]]
-        img = node["children"][1]["children"][0]
-        title = describe(node["children"][0]["children"][0])[0].split(None, 1)[1]
-        return [f"{indent}{name:<7} {ratios} {title}  img {img['_size'][0]}×{img['_size'][1]}"
-                f"  ({os.path.basename(img['_file'])})"]
+        titles = [describe(n)[0].split(None, 1)[1] for n in node["children"][0]["children"]
+                  if n["block_type"] == BLOCK_HEADING[4]]
+        imgs = [c["children"][0] for c in node["children"][1:]]
+        return [f"{indent}{name:<7} {ratios} {' + '.join(titles)}  img "
+                + ", ".join(f"{i['_size'][0]}×{i['_size'][1]} ({os.path.basename(i['_file'])})" for i in imgs)]
     if bt == BLOCK_TABLE:
         p = node["table"]["property"]
         return [f"{indent}{name:<7} {p['row_size']}×{p['column_size']} widths {p['column_width']}"]
@@ -464,6 +501,11 @@ def main():
     p.add_argument("--page-width", type=int, default=820, help="doc content width in px")
     p.add_argument("--max-img-h", type=int, default=380, help="max displayed mockup height in px")
     p.add_argument("--max-img-ratio", type=int, default=72, help="max grid share of the mockup column, %%")
+    p.add_argument("--pair-text-ratio", type=int, default=40,
+                   help="text column share when two configurations share a row, %%")
+    p.add_argument("--pair-min-h", type=int, default=300,
+                   help="only pair two configurations if their mockups stay at least this tall, px")
+    p.add_argument("--no-specs", action="store_true", help="leave out the Specs sections")
     opts = p.parse_args()
 
     with open(opts.spec, encoding="utf-8") as f:
