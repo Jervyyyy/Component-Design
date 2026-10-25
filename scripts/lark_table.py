@@ -38,7 +38,9 @@ BLOCK_TABLE_CELL = 32
 
 
 class LarkError(RuntimeError):
-    pass
+    def __init__(self, msg, code=None):
+        super().__init__(msg)
+        self.code = code
 
 
 class Client:
@@ -67,7 +69,8 @@ class Client:
         except urllib.error.HTTPError as e:
             payload = json.loads(e.read() or b"{}")
         if payload.get("code", 0) != 0:
-            raise LarkError(f"{method} {path}: {payload.get('code')} {payload.get('msg')}")
+            raise LarkError(f"{method} {path}: {payload.get('code')} {payload.get('msg')}",
+                            payload.get("code"))
         return payload.get("data", payload)
 
     def get(self, path, **params):
