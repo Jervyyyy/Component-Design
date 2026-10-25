@@ -34,5 +34,6 @@
    python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --until Navigation # 总览 + 第一个组件
    python3 scripts/lark_doc_spec.py <文档链接> --spec specs/iphone-duo-p0.json --from Sheet --no-specs  # 其余组件，不写 Specs
    ```
+   开头的 Overview / Priority（JSON 的 `intro`，来自 Figma `1:8638`）可单独插到文档最前面：`--intro-only --at-start`。
    每段写完会回读校验；已创建的块 ID 记在 `shots/duo-p0/progress.json`，中途失败可以用 `--from` 续写。
    不用 CLI 时可加 `--client app`，改用自建应用凭证（`LARK_APP_ID` / `LARK_APP_SECRET` / `LARK_DOMAIN`，应用需加为文档协作者）。

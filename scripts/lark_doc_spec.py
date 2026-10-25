@@ -15,7 +15,8 @@ Usage:
   python3 scripts/lark_doc_spec.py <doc_url_or_id> --spec specs/iphone-duo-p0.json [--only N] [--from N] [--until N]
 
 N is a 1-based component number or a prefix of "<name> <cn>", e.g. "Sheet" or "Share 分享面板".
---only / --from skip the overview section at the top; --no-intro skips it explicitly.
+--only / --from skip the overview section at the top (spec "intro"); --no-intro skips it explicitly,
+--intro-only writes just that section, --at-start inserts at the top of the document instead of appending.
 """
 import argparse
 import json
@@ -47,6 +48,7 @@ NAMES = {2: "P", 3: "H1", 4: "H2", 5: "H3", 6: "H4", 12: "UL", 13: "OL", 19: "CA
          22: "HR", 24: "GRID", 25: "COL", 27: "IMG", 31: "TABLE", 32: "CELL"}
 
 GRAY, ORANGE = 7, 2        # text_color
+COLORS = {"red": 1, "orange": 2, "blue": 5, "gray": 7}
 CALLOUT_BLUE = 5           # background_color / border_color
 COL_PAD = 24               # horizontal padding inside a grid column, px
 RETRY_CODES = {99991400, 1254290, 1254291}   # rate limit / edit conflict
@@ -101,9 +103,11 @@ def spec_lines(lines):
     return out
 
 
-def callout(title, items):
+def callout(title, items=(), text=""):
+    """Title plus either numbered items or plain paragraphs."""
     children = [text_block([run(title, bold=True)])]
     children += [text_block(rich(item), BLOCK_ORDERED) for item in items]
+    children += paragraphs(text)
     return {"block_type": BLOCK_CALLOUT,
             "callout": {"background_color": CALLOUT_BLUE, "border_color": CALLOUT_BLUE,
                         "emoji_id": "pushpin"},
@@ -190,28 +194,51 @@ def config_rows(blocks, image_dir, opts):
     return rows
 
 
+def cards(items):
+    """Equal-width grid of cards: colored tag + name, count, gray description, item lines."""
+    n = len(items)
+    columns = []
+    for c in items:
+        color = COLORS[c["color"]]
+        columns.append([text_block([run(c["tag"], color=color), run(f"  {c['name']}")], BLOCK_HEADING[3]),
+                        text_block([run(c["count"], color=color)]),
+                        text_block([run(c["desc"], color=GRAY)])]
+                       + [text_block([run(item)]) for item in c["items"]])
+    ratios = [100 // n] * (n - 1) + [100 - 100 // n * (n - 1)]
+    return {"block_type": BLOCK_GRID, "grid": {"column_size": n},
+            "children": [{"block_type": BLOCK_GRID_COLUMN, "grid_column": {"width_ratio": r},
+                          "children": col} for r, col in zip(ratios, columns)]}
+
+
 def component_nodes(comp, image_dir, opts):
     """Top-level blocks for one component, grouped: each group is one API call."""
-    groups = [[heading(1, f"{comp['name']} {comp['cn']}"),
-               text_block([run(comp["meta"], color=GRAY)])]]
+    return [[heading(1, f"{comp['name']} {comp['cn']}"),
+             text_block([run(comp["meta"], color=GRAY)])]] + block_groups(comp["blocks"], image_dir, opts)
+
+
+def block_groups(blocks, image_dir, opts):
+    groups = [[]]
     configs, skipping = [], False
-    for b in comp["blocks"] + [{"type": "end"}]:
+    for b in blocks + [{"type": "end"}]:
         t = b["type"]
         if t != "config" and configs:
             groups += [[row] for row in config_rows(configs, image_dir, opts)]
             configs = []
-        if t in ("h2", "h3"):
+        if t in ("h1", "h2", "h3"):
             skipping = opts.no_specs and b["text"].startswith("Specs")
         if skipping or t == "end":
             continue
-        if t in ("h2", "h3"):
+        if t in ("h1", "h2", "h3"):
             simple = [heading(int(t[1]), b["text"])]
         elif t == "p":
             simple = paragraphs(b["text"])
         elif t == "note":
             simple = paragraphs(b["text"], color=GRAY)
         elif t == "callout":
-            groups.append([callout(b["title"], b["items"])])
+            groups.append([callout(b["title"], b.get("items", ()), b.get("text", ""))])
+            continue
+        elif t == "cards":
+            groups.append([cards(b["cards"])])
             continue
         elif t == "config":
             configs.append(b)
@@ -220,32 +247,16 @@ def component_nodes(comp, image_dir, opts):
             groups.append([table(b["rows"], b["widths"], opts.page_width)])
             continue
         else:
-            raise ValueError(f"{comp['name']}: unknown block type {t!r}")
+            raise ValueError(f"unknown block type {t!r}")
         if all(n["block_type"] in TEXT_KEY for n in groups[-1]):
             groups[-1] += simple
         else:
             groups.append(simple)
-    return groups
+    return [g for g in groups if g]
 
 
-def intro_nodes(spec, opts):
-    rows = [["组件", "覆盖形态", "更新", "状态"]]
-    for comp in spec["components"]:
-        forms = []
-        for b in comp["blocks"]:
-            if b["type"] == "config":
-                key = b["title"].split(" · ")[0]
-                if key not in forms:
-                    forms.append(key)
-        meta = dict(re.findall(r"(更新|状态)：([^｜]+)", comp["meta"]))
-        rows.append([f"{comp['name']} {comp['cn']}", " / ".join(forms),
-                     meta.get("更新", "").strip(), meta.get("状态", "").strip()])
-    return [[heading(1, "总览"),
-             text_block([run("来源："), run(f"Figma · {spec['title']}", link=spec["figma"]),
-                         run(f" ｜ 共 {len(spec['components'])} 个组件；示意图按 1× 绘制，点击图片可查看原图。",
-                             color=GRAY)])],
-            [table(rows, [300, 220, 160, 520], opts.page_width)],
-            [{"block_type": BLOCK_DIVIDER, "divider": {}}]]
+def intro_nodes(spec, image_dir, opts):
+    return block_groups(spec["intro"], image_dir, opts) + [[{"block_type": BLOCK_DIVIDER, "divider": {}}]]
 
 
 # ---------------------------------------------------------------- dry run
@@ -256,6 +267,10 @@ def describe(node, indent=""):
     if bt in TEXT_KEY:
         content = "".join(e["text_run"]["content"] for e in node[TEXT_KEY[bt]]["elements"])
         return [f"{indent}{name:<7} {content[:60]}"]
+    if bt == BLOCK_GRID and not any(n["block_type"] == BLOCK_IMAGE for n in walk(node)):
+        ratios = [c["grid_column"]["width_ratio"] for c in node["children"]]
+        titles = [describe(c["children"][0])[0].split(None, 1)[1] for c in node["children"]]
+        return [f"{indent}{name:<7} {ratios} {' | '.join(titles)}"]
     if bt == BLOCK_GRID:
         ratios = [c["grid_column"]["width_ratio"] for c in node["children"]]
         titles = [describe(n)[0].split(None, 1)[1] for n in node["children"][0]["children"]
@@ -393,21 +408,21 @@ def insert_image(client, doc_id, block_id, path, size):
         call(client.patch, url, {"replace_image": {"token": token}}, document_revision_id=-1)
 
 
-def create_descendants(client, doc_id, parent_id, nodes, safe=False):
+def create_descendants(client, doc_id, parent_id, nodes, safe=False, index=-1):
     top, descendants, images = flatten(nodes, safe)
     res = call(client.post, f"/open-apis/docx/v1/documents/{doc_id}/blocks/{parent_id}/descendant",
-               {"children_id": top, "index": -1, "descendants": descendants},
+               {"children_id": top, "index": index, "descendants": descendants},
                document_revision_id=-1)
     rel = {r["temporary_block_id"]: r["block_id"] for r in res.get("block_id_relations", [])}
     return [rel[t] for t in top], [(rel[t], path, size) for t, (path, size) in images.items()]
 
 
-def create_grid_stepwise(client, doc_id, grid):
+def create_grid_stepwise(client, doc_id, grid, index=-1):
     """Fallback: create an empty grid, set its column ratios, then fill each column."""
     base = f"/open-apis/docx/v1/documents/{doc_id}/blocks"
     res = call(client.post, f"{base}/{doc_id}/children",
                {"children": [{"block_type": BLOCK_GRID, "grid": {"column_size": len(grid["children"])}}],
-                "index": -1}, document_revision_id=-1)
+                "index": index}, document_revision_id=-1)
     grid_id = res["children"][0]["block_id"]
     col_ids = res["children"][0]["children"]
     call(client.patch, f"{base}/{grid_id}",
@@ -426,18 +441,18 @@ def create_grid_stepwise(client, doc_id, grid):
     return [grid_id], images
 
 
-def create_group(client, doc_id, nodes):
+def create_group(client, doc_id, nodes, index=-1):
     try:
-        return create_descendants(client, doc_id, doc_id, nodes)
+        return create_descendants(client, doc_id, doc_id, nodes, index=index)
     except LarkError as e:
         print(f"      create failed ({e}); retrying without optional styling", file=sys.stderr)
     try:
-        return create_descendants(client, doc_id, doc_id, nodes, safe=True)
+        return create_descendants(client, doc_id, doc_id, nodes, safe=True, index=index)
     except LarkError as e:
         if not (len(nodes) == 1 and nodes[0]["block_type"] == BLOCK_GRID):
             raise
         print(f"      create failed again ({e}); building the grid step by step", file=sys.stderr)
-    return create_grid_stepwise(client, doc_id, nodes[0])
+    return create_grid_stepwise(client, doc_id, nodes[0], index)
 
 
 def verify(client, doc_id, created, groups):
@@ -494,7 +509,9 @@ def main():
     p.add_argument("--only", help="write just this component")
     p.add_argument("--from", dest="start", help="write this component and the ones after it")
     p.add_argument("--until", help="stop after this component (inclusive)")
-    p.add_argument("--no-intro", action="store_true", help="skip the overview table at the top")
+    p.add_argument("--no-intro", action="store_true", help="skip the overview section at the top")
+    p.add_argument("--intro-only", action="store_true", help="write only the overview section")
+    p.add_argument("--at-start", action="store_true", help="insert at the top of the document instead of appending")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--client", choices=("cli", "app"), default="cli" if shutil.which("lark-cli") else "app",
                    help="cli: lark-cli as the logged-in user (default when installed); app: LARK_APP_ID/SECRET")
@@ -513,11 +530,13 @@ def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(opts.spec)))
     image_dir = os.path.join(root, spec["image_dir"])
     picked = select(spec["components"], opts.only, opts.start, opts.until)
-    with_intro = not (opts.no_intro or opts.only or opts.start)
+    with_intro = opts.intro_only or not (opts.no_intro or opts.only or opts.start)
+    if opts.intro_only:
+        picked = []
 
     plan = []   # (label, groups)
     if with_intro:
-        plan.append(("总览", intro_nodes(spec, opts)))
+        plan.append(("Overview", intro_nodes(spec, image_dir, opts)))
     for i in picked:
         comp = spec["components"][i]
         groups = component_nodes(comp, image_dir, opts)
@@ -559,12 +578,15 @@ def main():
         client = CliClient() if opts.client == "cli" else Client(app_id, secret)
         doc_id = doc_token(client, opts.url)
         progress.setdefault(doc_id, {})
+        pos = 0 if opts.at_start else -1   # insertion index among the document's top-level blocks
         for label, groups in plan:
             print(f"== {label}")
             created = []
             for g in groups:
-                ids, images = create_group(client, doc_id, g)
+                ids, images = create_group(client, doc_id, g, pos)
                 created += ids
+                if pos >= 0:
+                    pos += len(ids)
                 progress[doc_id][label] = created
                 with open(progress_path, "w", encoding="utf-8") as f:
                     json.dump(progress, f, ensure_ascii=False, indent=1)

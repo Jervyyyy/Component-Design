@@ -2,6 +2,28 @@
   "title": "P0 组件 · iPhone Duo 适配规范",
   "figma": "https://www.figma.com/design/oHezsUjHCypfTlqnOL15cY/iPhone-Duo-Adaptive-Design-for-Trip-1?node-id=1-8849",
   "image_dir": "shots/duo-p0",
+  "intro_source": "1:8638 TDS 组件 · iPhone Duo 适配清单 (Overview / .Note / Priority)",
+  "intro": [
+    {"type": "h1", "text": "Overview 概述"},
+    {"type": "p", "text": "基于 iPhone Duo 的设备形态与断点，对 TDS ToC 2026 的 42 个组件及 Video 视频组件逐一评估：32 个需补充 Duo 适配说明，其中 P0 6 个；11 个无需适配或不适用。"},
+    {"type": "callout", "title": "评估维度", "text": "覆盖外屏竖握、内屏竖握、内屏横握、内屏半折 4 种形态，检查 3 类风险：\n① 宽度拉伸与比例失调\n② 内容跨越折痕（Hinge）\n③ 与 Vertical Bar 及系统保留区冲突"},
+    {"type": "h1", "text": "Priority"},
+    {"type": "p", "text": "按适配影响分级：P0 优先落地，P1 随 P0 结论同步，P2 在组件文档中补充约束。"},
+    {"type": "cards", "cards": [
+      {"tag": "P0", "name": "结构级", "color": "red", "count": "7 个组件",
+       "desc": "位置、宽度或层级随形态变化，未适配将跨越折痕或与 Vertical Bar 冲突",
+       "items": ["标题栏 Navigation Bar", "浮层 Sheet", "对话框 Dialog", "底栏 Bottom Bar", "列表 List - need UX", "日历 Calendar - need UX", "分享 Share -  need UX", "OCR （非 TDS 组件）"]},
+      {"tag": "P1", "name": "布局级", "color": "orange", "count": "15 个组件",
+       "desc": "结构不变，宽度、对齐与定位需随断点调整",
+       "items": ["浮动按钮 Floating Button", "选项卡 Tab", "临时提示 Toast", "气泡 Popover · Tooltip", "选择器 Picker", "输入与表单 Text Input · Textarea · Form", "图片 · 轮播 Image · Carousel", "空状态 · 结果页 · 加载 Empty · Result · Loading", "视频 Video -  need UX"]},
+      {"tag": "P2", "name": "补充说明", "color": "blue", "count": "11 个组件",
+       "desc": "沿用通用规则，补充 1–2 条组件级约束",
+       "items": ["日期 · 时间选择器 Date / Time Picker", "下拉选择 Select", "通知栏 Notice", "搜索 Search", "分段控制器 Segmented Control", "系统 System", "按钮 Button", "胶囊标签 Chips", "选项 Choice", "分割线 Divider"]},
+      {"tag": "—", "name": "无需适配", "color": "gray", "count": "9 个组件",
+       "desc": "原子组件，尺寸固定，随容器布局",
+       "items": ["链接 Link", "标签 Tag", "徽标 Badge", "开关 Switch", "复选 Checkbox", "单选 Radio", "数字输入 Input Number", "滑动输入条 Slider", "评分 Rate"]}
+    ]}
+  ],
   "components": [
     {
       "name": "Navigation Bar",
