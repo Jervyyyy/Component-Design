@@ -5,8 +5,10 @@ Layout: every configuration is a two-column grid (spec text | mockup) sized so t
 mockup is taller than --max-img-h; spec tables become native tables; core rules become
 a callout. Content is appended to the end of the document. Stdlib only.
 
-Env: same as lark_table.py (LARK_APP_ID, LARK_APP_SECRET, LARK_DOMAIN). The app must be
-added to the document with edit access.
+Calls go through the official Feishu CLI (`lark-cli`, npm @larksuite/cli) as the user
+logged in with `lark-cli auth login --domain docs,drive`, so the user's own edit access
+applies. --client app uses the app credentials from lark_table.py instead (LARK_APP_ID,
+LARK_APP_SECRET, LARK_DOMAIN; the app must be added to the document with edit access).
 
 Usage:
   python3 scripts/lark_doc_spec.py <doc_url_or_id> --spec specs/iphone-duo-p0.json --dry-run
@@ -20,7 +22,9 @@ import json
 import math
 import os
 import re
+import shutil
 import struct
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -251,6 +255,54 @@ def check(groups, opts):
 
 # ---------------------------------------------------------------- writing
 
+class CliClient:
+    """Same surface as lark_table.Client, sending every call through lark-cli."""
+
+    def __init__(self, identity="user"):
+        self.identity = identity
+        self.env = dict(os.environ, LARKSUITE_CLI_NO_UPDATE_NOTIFIER="1",
+                        LARKSUITE_CLI_NO_SKILLS_NOTIFIER="1")
+
+    def _run(self, args, stdin=None):
+        p = subprocess.run(["lark-cli", *args, "--as", self.identity], input=stdin,
+                           capture_output=True, text=True, env=self.env)
+        out = (p.stdout if p.returncode == 0 else p.stderr).strip()
+        try:
+            payload = json.loads(out)
+        except ValueError:
+            raise LarkError(f"lark-cli {' '.join(args[:3])}: {out[:300]}")
+        if not payload.get("ok"):
+            err = payload.get("error", {})
+            raise LarkError(f"lark-cli {' '.join(args[:3])}: {err.get('code')} {err.get('message')}",
+                            err.get("code"))
+        return payload.get("data") or {}
+
+    def _request(self, method, path, params=None, body=None, **_):
+        args = ["api", method, path]
+        if params:
+            args += ["--params", json.dumps(params)]
+        if body is not None:
+            args += ["--data", "-"]
+        return self._run(args, json.dumps(body, ensure_ascii=False) if body is not None else None)
+
+    def get(self, path, **params):
+        return self._request("GET", path, params=params)
+
+    def post(self, path, body, **params):
+        return self._request("POST", path, params=params, body=body)
+
+    def patch(self, path, body, **params):
+        return self._request("PATCH", path, params=params, body=body)
+
+    def upload_media(self, file_path, parent_type, parent_node, extra=None):
+        # lark-cli only accepts file paths relative to the working directory
+        args = ["docs", "+media-upload", "--file", os.path.relpath(file_path),
+                "--parent-type", parent_type, "--parent-node", parent_node]
+        if extra and extra.get("drive_route_token"):
+            args += ["--doc-id", extra["drive_route_token"]]
+        return self._run(args)["file_token"]
+
+
 def call(fn, *args, **kwargs):
     for attempt in range(5):
         try:
@@ -407,6 +459,8 @@ def main():
     p.add_argument("--until", help="stop after this component (inclusive)")
     p.add_argument("--no-intro", action="store_true", help="skip the overview table at the top")
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--client", choices=("cli", "app"), default="cli" if shutil.which("lark-cli") else "app",
+                   help="cli: lark-cli as the logged-in user (default when installed); app: LARK_APP_ID/SECRET")
     p.add_argument("--page-width", type=int, default=820, help="doc content width in px")
     p.add_argument("--max-img-h", type=int, default=380, help="max displayed mockup height in px")
     p.add_argument("--max-img-ratio", type=int, default=72, help="max grid share of the mockup column, %%")
@@ -449,9 +503,10 @@ def main():
     if problems:
         sys.exit("refusing to write:\n  " + "\n  ".join(problems))
 
-    app_id, secret = os.environ.get("LARK_APP_ID"), os.environ.get("LARK_APP_SECRET")
-    if not app_id or not secret:
-        sys.exit("set LARK_APP_ID and LARK_APP_SECRET")
+    if opts.client == "app":
+        app_id, secret = os.environ.get("LARK_APP_ID"), os.environ.get("LARK_APP_SECRET")
+        if not app_id or not secret:
+            sys.exit("set LARK_APP_ID and LARK_APP_SECRET, or use --client cli")
     progress_path = os.path.join(image_dir, "progress.json")
     try:
         with open(progress_path, encoding="utf-8") as f:
@@ -459,7 +514,7 @@ def main():
     except FileNotFoundError:
         progress = {}
     try:
-        client = Client(app_id, secret)
+        client = CliClient() if opts.client == "cli" else Client(app_id, secret)
         doc_id = doc_token(client, opts.url)
         progress.setdefault(doc_id, {})
         for label, groups in plan:
