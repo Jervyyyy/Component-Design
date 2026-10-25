@@ -19,3 +19,21 @@
    python3 scripts/lark_table.py upload  <wiki链接> --plan shots/plan.csv
    ```
    已经有图的格子默认跳过；要追加的话加 `--append`。
+
+# P0 组件 · iPhone Duo 适配规范 → 飞书文档
+
+内容来自 Figma「P0 组件 · iPhone Duo 适配规范」（9 个组件），文字在 `duo_spec/content.json`，
+示意图（2x 导出）在 `duo_spec/images/`。每个形态用分栏排版：左栏规范文字、右栏示意图；
+横屏图两张并排放在文字下方，不会出现一张图占满一屏。
+
+```bash
+python3 scripts/lark_duo_spec.py preview      # 本地预览排版：duo_spec/preview.html
+export LARK_APP_ID=cli_xxx LARK_APP_SECRET=xxx  # 应用需加为目标文档的可编辑协作者
+# 或者用自己的身份写：export LARK_USER_ACCESS_TOKEN=u-xxx
+python3 scripts/lark_duo_spec.py write https://trip.larkenterprise.com/docx/BZVadsS5uoXkzuxpEo7ctGGgnDt --dry-run
+python3 scripts/lark_duo_spec.py write https://trip.larkenterprise.com/docx/BZVadsS5uoXkzuxpEo7ctGGgnDt
+```
+- 默认追加到文档末尾；文档标题为空时自动设为「P0 组件 · iPhone Duo 适配规范」。
+- `--clear` 会先清空文档正文（会二次确认），适合整篇重写。
+- 按组件分段写入；中途失败时脚本会提示用 `--only` 从失败的那段继续，
+  可选值：`intro,navbar,sheet,share,dialog,bottombar,list,calendar,ocr,sharec`。
