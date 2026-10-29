@@ -330,7 +330,7 @@ export function Video({ p, env, live }) {
     ${!mediaOnly && p.hasControls && html`<${ControlBar} type=${cbType} scrubbing=${scrubbing} hasSpeed=${p.cb.hasSpeed} hasRotate=${p.cb.hasRotate}
         hasPreview=${p.cb.hasPreview} hasCounter=${p.cb.hasCounter} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${env.margin}
         maxWidth=${!vertical ? env.controlMaxWidth : null} onScrub=${live.onScrub} onRotate=${env.onRotate} playlist=${env.playlist} filmstrip=${filmstrip} />`}
-    ${!mediaOnly && p.hasSideRail && vertical && html`<${SideRail} rail=${p.rail} right=${Math.max(12, env.margin - 4)}
+    ${!mediaOnly && p.hasSideRail && vertical && !env.railInVerticalBar && html`<${SideRail} rail=${p.rail} right=${Math.max(12, env.margin - 4)}
         bottom=${p.hasControls ? cbHeight + 6 + (p.cb.hasCounter && filmstrip && !scrubbing ? 101 : 0) : 40} />`}
     ${!mediaOnly && html`<div class="v-top" style=${env.statusBar ? '' : `padding-top:${top}px`}>
       ${env.statusBar && html`<${StatusBar} />`}

@@ -2,7 +2,7 @@ import { html, render, useState, useEffect, useRef, useLayoutEffect, cx, fmtTime
 import { Icon, RawSvg, DUO_LEVELS, STATUS_ICONS } from './icons.js';
 import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
-import { Video, TopBar, ControlBar, CenterState } from './video.js';
+import { Video, TopBar, ControlBar, CenterState, SideRail } from './video.js';
 import { resolve, CLASS_LABEL, DUO } from './rules.js';
 import { Panel } from './panel.js';
 
@@ -56,11 +56,12 @@ function Dims({ segs, top = -52, rows }) {
   })}`;
 }
 
-function VerticalBar({ theme = 'dark', showCam = true }) {
+function VerticalBar({ theme = 'dark', showCam = true, children }) {
   return html`<div class=${'vbar ' + theme}>
     ${showCam && html`<i class="cam"></i>`}
     <div class="vb-time" style=${`margin-top:${showCam ? 22 : 40}px`}>9:41</div>
     <${RawSvg} svg=${DUO_LEVELS} cls="vb-levels" />
+    ${children}
   </div>`;
 }
 
@@ -95,11 +96,16 @@ function Duo({ st, set, live }) {
   const pad = 14;
 
   if (k === 'A') {
-    // 外屏竖握：画面与控件限内容区 382，不进入 Vertical Bar；状态栏在 Vertical Bar 内反白
+    // 外屏竖握：画面与控件限内容区 382；状态栏在 Vertical Bar 内反白；
+    // SideRail 一列操作项放进 Vertical Bar（84pt 居中），不占用内容区
     r = resolve(st, { kind: 'duo', w: 382, h: 678, posture: k });
+    const p = r.p;
+    const railBottom = p.hasControls ? (p.cb.type === 'minimal' ? 88 : 76) + 6 : 40;
     screen = html`<div class="screen" style="width:466px;height:678px">
-      <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 382, h: 678 }} live=${live} /></div>
-      <${VerticalBar} theme="dark" />
+      <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 382, h: 678, railInVerticalBar: true }} live=${live} /></div>
+      <${VerticalBar} theme="dark">
+        ${p.hasSideRail && html`<${SideRail} rail=${p.rail} right=${18} bottom=${railBottom} />`}
+      <//>
     </div>`;
     annRows = [[['内容区 382', 382], ['Vertical Bar 84', 84]], [['16', 16], ['', 350, true], ['16', 16]]];
   } else if (k === 'B') {

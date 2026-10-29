@@ -63,6 +63,8 @@ export function resolve(state, { kind, w, h, posture }) {
   const rotateHint = kind === 'iphone' || (kind === 'resizable' && cls === 'phone');
   if (vertical && state.ratio === '16:9' && !rotateHint) notes.push('「Rotate for fullscreen」不出现（大屏 / Duo 外屏横握已禁用）');
 
+  if (posture === 'A' && hasSideRail) notes.push('Duo 外屏：SideRail 放在 Vertical Bar 内，不占内容区 382');
+
   const margin = kind === 'iphone' ? 16 : marginFor(w);
   notes.push(`控件左右边距 ${margin}（${w < 600 ? '< 600' : w < 834 ? '600–834' : '834–1184'} 档）`);
   if (cls === 'large' && !vertical) notes.push('横屏控制栏最大宽度 1024pt 居中');
