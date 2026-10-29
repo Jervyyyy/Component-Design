@@ -4,7 +4,7 @@ import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
 import { Video, TopBar, ControlBar, CenterState, SideRail } from './video.js';
 import { resolve, CLASS_LABEL, DUO } from './rules.js';
-import { Panel } from './panel.js';
+import { Panel, DeviceBar } from './panel.js';
 
 export const DEFAULTS = {
   device: 'iphone',          // iphone | duo | resizable
@@ -256,17 +256,11 @@ function App() {
   const scale = stage.w ? Math.min(1, (stage.w - pad * 2) / dev.natural.w, (stage.h - pad * 2) / dev.natural.h) : 1;
   scaleRef.current = scale;
 
-  const title = st.device === 'iphone' ? `iPhone · ${st.iphoneOrient === 'vertical' ? '375 × 812' : '812 × 375'}`
-    : st.device === 'duo' ? `iPhone Duo · ${st.duo} ${DUO[st.duo].name} · ${DUO[st.duo].w} × ${DUO[st.duo].h}`
-    : `Resizable · ${st.rz.w} × ${st.rz.h}`;
 
   return html`<div class="app">
     <${Panel} st=${st} set=${set} resolved=${dev.r} scrubbing=${scrubbing} ps=${ps} controlsHidden=${controlsHidden} />
     <main class="stage">
-      <div class="stage-bar">
-        <div class="stage-title"><b>Demo</b>${title}</div>
-        <div class="stage-title">${Math.round(scale * 100)}%</div>
-      </div>
+      <${DeviceBar} st=${st} set=${set} resolved=${dev.r} scale=${scale} />
       <div class="stage-canvas" ref=${stageRef}>
         <div class="stage-scale" style=${`transform:translate(-50%,-50%) scale(${scale})`}>${dev.node}</div>
       </div>

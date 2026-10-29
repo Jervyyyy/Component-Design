@@ -4,7 +4,7 @@ import { player, speedLabel } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
 import { CLASS_LABEL, DUO } from './rules.js';
 
-function Seg({ value, options, onChange, full, disabled }) {
+export function Seg({ value, options, onChange, full, disabled }) {
   return html`<div class=${cx('segc', full && 'full')}>
     ${options.map((o) => {
       const [v, label] = Array.isArray(o) ? o : [o, o];
@@ -13,7 +13,7 @@ function Seg({ value, options, onChange, full, disabled }) {
   </div>`;
 }
 
-function Switch({ on, onChange, disabled }) {
+export function Switch({ on, onChange, disabled }) {
   return html`<button class=${cx('switch', on && 'on')} role="switch" aria-checked=${on} disabled=${disabled} onClick=${() => onChange(!on)}></button>`;
 }
 
@@ -38,6 +38,27 @@ const RZ_PRESETS = [
   ['Duo 内屏横', 951, 669], ['Flip 外屏', 360, 420], ['平板', 1024, 768], ['分屏小窗', 520, 440],
 ];
 
+// Demo 区顶部：设备 / 窗口尺寸选择
+export function DeviceBar({ st, set, resolved, scale }) {
+  return html`<div class="devbar">
+    <div class="devbar-row">
+      <${Seg} value=${st.device} onChange=${(v) => set({ device: v })} options=${[['iphone', 'iPhone'], ['duo', 'iPhone Duo'], ['resizable', 'Resizable']]} />
+      ${st.device === 'iphone' && html`<${Seg} value=${st.iphoneOrient} onChange=${(v) => set({ iphoneOrient: v })} options=${[['vertical', '竖屏 375×812'], ['horizontal', '横屏 812×375']]} />`}
+      ${st.device === 'duo' && html`<div class="segc">${Object.entries(DUO).map(([k, d]) => html`<button class=${cx(st.duo === k && 'on')} title=${`${d.en} · ${d.w} × ${d.h} pt`} onClick=${() => set({ duo: k })}><b class="dk">${k}</b>${d.name}</button>`)}</div>`}
+      <span class="devbar-zoom">${Math.round(scale * 100)}%</span>
+    </div>
+    ${st.device === 'duo' && html`<div class="devbar-row sub">
+      <span class="devbar-meta">${DUO[st.duo].en} · ${DUO[st.duo].w} × ${DUO[st.duo].h} pt</span>
+      ${st.duo === 'D' && html`<span class="devbar-item">下半屏 <${Seg} value=${st.duoD} onChange=${(v) => set({ duoD: v })} options=${[['info', '信息与选集'], ['center', '中心状态']]} /></span>`}
+      <span class="devbar-item">显示标注 <${Switch} on=${st.annotate} onChange=${(v) => set({ annotate: v })} /></span>
+    </div>`}
+    ${st.device === 'resizable' && html`<div class="devbar-row sub">
+      <span class="devbar-meta"><b>${st.rz.w} × ${st.rz.h} pt</b> · ${CLASS_LABEL[resolved.cls]} · 拖动窗口边缘调整</span>
+      <div class="chips">${RZ_PRESETS.map(([n, w, h]) => html`<button class=${cx('chip', st.rz.w === w && st.rz.h === h && 'on')} onClick=${() => set({ rz: { w, h } })}>${n} ${w}×${h}</button>`)}</div>
+    </div>`}
+  </div>`;
+}
+
 export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
   const f = resolved.forced;
   const cb = (patch) => set((o) => ({ cb: { ...o.cb, ...patch } }));
@@ -51,24 +72,8 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
     <div class="panel-head">
       <div class="brand">Trip.com · TDS</div>
       <div class="panel-title"><b>Video 视频</b><span class="t-body-s" style="color:var(--text-tertiary)">Code Layer · 交互还原</span></div>
-      <div class="panel-sub t-body-s">左侧属性与 Figma 组件属性一一对应；右侧 Demo 可直接点击、拖动进度条、切换横竖屏与折叠形态。</div>
+      <div class="panel-sub t-body-s">左侧属性与 Figma 组件属性一一对应；右侧 Demo 顶部切换设备与窗口尺寸，画面可直接点击、拖动进度条。</div>
     </div>
-
-    <${Sec} name="Device" cn="设备 / 窗口">
-      <${Seg} full value=${st.device} onChange=${(v) => set({ device: v })} options=${[['iphone', 'iPhone'], ['duo', 'iPhone Duo'], ['resizable', 'Resizable']]} />
-      ${st.device === 'iphone' && html`<div style="margin-top:12px"><${Row} label="旋转设备" sub="Rotate for fullscreen / Shrink 同效"><${Seg} value=${st.iphoneOrient} onChange=${(v) => set({ iphoneOrient: v })} options=${[['vertical', '竖屏'], ['horizontal', '横屏']]} /><//></div>`}
-      ${st.device === 'duo' && html`<div class="cards" style="margin-top:12px">
-        ${Object.entries(DUO).map(([k, d]) => html`<button class=${cx('card', st.duo === k && 'on')} onClick=${() => set({ duo: k })}>
-          <span class="k">${k}</span><span><div class="tt">${d.name}</div><div class="ss">${d.en} · ${d.w} × ${d.h} pt</div></span>
-        </button>`)}
-        ${st.duo === 'D' && html`<${Row} label="下半屏内容" sub="桌面态：信息与选集 / 中心状态"><${Seg} value=${st.duoD} onChange=${(v) => set({ duoD: v })} options=${[['info', '信息'], ['center', '中心状态']]} /><//>`}
-        <${Row} label="显示标注" sub="尺寸、折痕区、Vertical Bar"><${Switch} on=${st.annotate} onChange=${(v) => set({ annotate: v })} /><//>
-      </div>`}
-      ${st.device === 'resizable' && html`<div style="margin-top:12px">
-        <${Row} label=${`${st.rz.w} × ${st.rz.h} pt`} sub="拖动 Demo 右侧 / 底部 / 右下角调整窗口"><span class="pill live">${CLASS_LABEL[resolved.cls]}</span><//>
-        <div class="chips" style="margin-top:10px">${RZ_PRESETS.map(([n, w, h]) => html`<button class=${cx('chip', st.rz.w === w && st.rz.h === h && 'on')} onClick=${() => set({ rz: { w, h } })}>${n} ${w}×${h}</button>`)}</div>
-      </div>`}
-    <//>
 
     <${Sec} name="Video" cn="主组件" tag="Video">
       <${Row} label="orientation" forced=${f.orientation} sub=${st.device === 'iphone' ? '由设备旋转决定' : null}>
