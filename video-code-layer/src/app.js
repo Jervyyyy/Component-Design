@@ -17,6 +17,7 @@ export const DEFAULTS = {
   hasTopBar: true,
   hasControls: true,
   hasSideRail: false,
+  autoHide: true,            // 播放时 3 秒无操作隐藏控件（行为规范，非 Figma 变体）
   ratio: '9:16',             // Media › ratio
   centerOverride: 'auto',    // CenterState instance: auto | loading | error
   cb: { type: 'auto', state: 'default', hasSpeed: true, hasRotate: true, hasPreview: false, hasCounter: false },
@@ -104,7 +105,7 @@ function Duo({ st, set, live }) {
     screen = html`<div class="screen" style="width:466px;height:678px">
       <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 382, h: 678, railInVerticalBar: true }} live=${live} /></div>
       <${VerticalBar} theme="dark">
-        ${p.hasSideRail && html`<${SideRail} rail=${p.rail} right=${18} bottom=${railBottom} />`}
+        ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${18} bottom=${railBottom} />`}
       <//>
     </div>`;
     annRows = [[['内容区 382', 382], ['Vertical Bar 84', 84]], [['16', 16], ['', 350, true], ['16', 16]]];
@@ -222,6 +223,7 @@ function Resizable({ st, set, live, scale }) {
 function App() {
   const [st, setSt] = useState(DEFAULTS);
   const [scrubbing, setScrubbing] = useState(false);
+  const [controlsHidden, setControlsHidden] = useState(false); // 运行时清屏状态，跨旋转/折叠/缩放保留
   const ps = usePlayer();
   const set = (patch) => setSt((o) => ({ ...o, ...(typeof patch === 'function' ? patch(o) : patch) }));
   const stageRef = useRef(null);
@@ -238,6 +240,8 @@ function App() {
   const live = {
     scrubbing,
     onScrub: setScrubbing,
+    controlsHidden,
+    setControlsHidden,
     onGroup: (g) => {
       set({ group: g });
       const list = clipsOf(g);
@@ -257,7 +261,7 @@ function App() {
     : `Resizable · ${st.rz.w} × ${st.rz.h}`;
 
   return html`<div class="app">
-    <${Panel} st=${st} set=${set} resolved=${dev.r} scrubbing=${scrubbing} ps=${ps} />
+    <${Panel} st=${st} set=${set} resolved=${dev.r} scrubbing=${scrubbing} ps=${ps} controlsHidden=${controlsHidden} />
     <main class="stage">
       <div class="stage-bar">
         <div class="stage-title"><b>Demo</b>${title}</div>

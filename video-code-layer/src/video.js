@@ -6,6 +6,7 @@ import { player, usePlayer, usePlayerTime, speedLabel } from './player.js';
 import { CLIPS, GROUPS } from './media.js';
 
 const RATIO = { '9:16': 9 / 16, '3:4': 3 / 4, '16:9': 16 / 9 };
+export const AUTO_HIDE_MS = 3000; // 播放时控件自动隐藏延时
 
 // ---------------------------------------------------------------------------------------------
 // Toast (Feedback Toast 反馈浮层 — spec only: 8 radius, 12 padding, Body/M, 16pt from top)
@@ -224,12 +225,12 @@ export function Counter({ playlist, filmstrip, margin = 12 }) {
 // ---------------------------------------------------------------------------------------------
 // Video.ControlBar — standard (68/76pt) | minimal (88pt); scrubbing grows upward
 // ---------------------------------------------------------------------------------------------
-export function ControlBar({ type, scrubbing, hasSpeed, hasRotate, hasPreview, hasCounter, hasChapters, ratio, margin = 16, maxWidth, onScrub, onRotate, playlist, filmstrip, bottom = 0, padBottom }) {
+export function ControlBar({ hidden, disabled, type, scrubbing, hasSpeed, hasRotate, hasPreview, hasCounter, hasChapters, ratio, margin = 16, maxWidth, onScrub, onRotate, playlist, filmstrip, bottom = 0, padBottom }) {
   const inner = maxWidth ? `max-width:${maxWidth}px;margin:0 auto;width:100%` : '';
   const counter = hasCounter && !scrubbing && html`<div class="vc-counter-wrap"><${Counter} playlist=${playlist} filmstrip=${filmstrip} /></div>`;
   if (type === 'standard') {
     const pb = padBottom ?? 32;
-    return html`<div class=${cx('v-controlbar', 'cb-standard', scrubbing && 'scrubbing')} style=${`bottom:${bottom}px;padding:${scrubbing ? 0 : 12}px ${margin}px ${pb}px`} onClick=${(e) => e.stopPropagation()}>
+    return html`<div class=${cx('v-controlbar', 'cb-standard', scrubbing && 'scrubbing', 'v-fade', 'down', hidden && 'is-hidden', disabled && 'is-disabled')} style=${`bottom:${bottom}px;padding:${scrubbing ? 0 : 12}px ${margin}px ${pb}px`} onClick=${(e) => e.stopPropagation()}>
       ${counter}
       ${scrubbing && hasPreview && html`<${Preview} ratio=${ratio} />`}
       ${scrubbing && html`<${Readout} />`}
@@ -244,7 +245,7 @@ export function ControlBar({ type, scrubbing, hasSpeed, hasRotate, hasPreview, h
   }
   // minimal
   const pb = padBottom ?? (scrubbing ? 64 : 40);
-  return html`<div class=${cx('v-controlbar', 'cb-minimal', scrubbing && 'scrubbing')} style=${`bottom:${bottom}px;padding-bottom:${pb}px`} onClick=${(e) => e.stopPropagation()}>
+  return html`<div class=${cx('v-controlbar', 'cb-minimal', scrubbing && 'scrubbing', 'v-fade', 'down', hidden && 'is-hidden', disabled && 'is-disabled')} style=${`bottom:${bottom}px;padding-bottom:${pb}px`} onClick=${(e) => e.stopPropagation()}>
     ${counter}
     ${scrubbing && hasPreview && html`<${Preview} ratio=${ratio} />`}
     ${scrubbing && html`<${Readout} />`}
@@ -259,7 +260,7 @@ export function ControlBar({ type, scrubbing, hasSpeed, hasRotate, hasPreview, h
 // ---------------------------------------------------------------------------------------------
 // Video.SideRail — 创作者 · 点赞 · 评论 · 收藏 · 分享 · 目录
 // ---------------------------------------------------------------------------------------------
-export function SideRail({ rail, right = 12, bottom = 94 }) {
+export function SideRail({ rail, right = 12, bottom = 94, hidden = false }) {
   const [liked, setLiked] = useState(false);
   const [faved, setFaved] = useState(false);
   const [followed, setFollowed] = useState(false);
@@ -269,7 +270,7 @@ export function SideRail({ rail, right = 12, bottom = 94 }) {
     <${Icon} name=${icon} size=${30} cls="vr-ic" />
     ${hasCount && count !== '' && html`<span class="t-body-xs-em vr-count">${count}</span>`}
   </button>`;
-  return html`<div class="v-siderail" style=${`right:${right}px;bottom:${bottom}px`} onClick=${stop}>
+  return html`<div class=${cx('v-siderail', 'v-fade', hidden && 'is-hidden')} style=${`right:${right}px;bottom:${bottom}px`} onClick=${stop}>
     <div class="vr-actions">
       ${rail.hasCreator && html`<button class="vr-creator" onClick=${(e) => { stop(e); setFollowed(!followed); }} aria-label="Creator">
         <span class="vr-avatar"></span>
@@ -316,25 +317,47 @@ export function Video({ p, env, live }) {
   const cbHeight = cbType === 'minimal' ? 88 : 76;
   const top = env.statusBar ? 62 : env.topInset;
   const filmstrip = vertical && p.ratio === '16:9';
-  const tap = () => { if (display === 'playing' || display === 'paused') player.toggle(); };
+  // 控件显隐（Spec §5.2 / §6 / §12）：
+  //  · 单击画面只显隐全部可见控件，不改变播放状态；播放/暂停只由固定按钮负责
+  //  · playing 默认 3s 无操作自动隐藏；任何控件操作、拖动进度后重新计时
+  //  · paused / loading / error / scrubbing 时控件常显（单击画面不隐藏）
+  //  · 显隐状态由外层持有，旋转、折叠、改变窗口尺寸时保持不变
+  const forceShow = display !== 'playing' || scrubbing;
+  const hidden = !mediaOnly && live.controlsHidden && !forceShow;
+  const timer = useRef(null);
+  const arm = () => {
+    clearTimeout(timer.current);
+    if (p.autoHide && !forceShow && !mediaOnly) timer.current = setTimeout(() => live.setControlsHidden(true), AUTO_HIDE_MS);
+  };
+  useEffect(() => {
+    if (forceShow && live.controlsHidden) live.setControlsHidden(false);
+    if (!hidden) arm(); else clearTimeout(timer.current);
+    return () => clearTimeout(timer.current);
+  }, [forceShow, hidden, p.autoHide]);
+  const fade = cx('v-fade', hidden && 'is-hidden');
+  const onPointerDown = () => { if (!hidden) arm(); };
+  const tap = () => {
+    if (forceShow || mediaOnly) return;
+    live.setControlsHidden(!hidden);
+  };
   const scrimTop = vertical ? 140 : 96, scrimBottom = vertical ? 220 : 160;
 
-  return html`<div class=${cx('tds-video', vertical ? 'is-vertical' : 'is-horizontal')} style=${`width:${W}px;height:${H}px`} onClick=${tap}>
+  return html`<div class=${cx('tds-video', vertical ? 'is-vertical' : 'is-horizontal')} style=${`width:${W}px;height:${H}px`} onPointerDownCapture=${onPointerDown} onClick=${tap} data-controls=${hidden ? 'hidden' : 'shown'}>
     <${MediaFrame} rect=${rect} onTap=${null} />
-    ${showHint && html`<button class="v-hint t-body-xs-em" style=${`top:${rect.hintY}px`} onClick=${(e) => { e.stopPropagation(); env.onRotate && env.onRotate('horizontal'); }}>
+    ${showHint && html`<button class=${cx('v-hint t-body-xs-em', fade)} style=${`top:${rect.hintY}px`} onClick=${(e) => { e.stopPropagation(); env.onRotate && env.onRotate('horizontal'); }}>
       <${Icon} name="rotate_screen_horizontal_outlined" size=${16} />Rotate for fullscreen
     </button>`}
-    <div class="v-scrim-top" style=${`height:${scrimTop}px`}></div>
-    <div class="v-scrim-bottom" style=${`height:${scrimBottom}px`}></div>
-    ${display !== 'hidden' && html`<${CenterState} display=${display === 'playing' ? 'playing' : display} />`}
-    ${!mediaOnly && p.hasControls && html`<${ControlBar} type=${cbType} scrubbing=${scrubbing} hasSpeed=${p.cb.hasSpeed} hasRotate=${p.cb.hasRotate}
+    <div class=${cx('v-scrim-top', fade)} style=${`height:${scrimTop}px`}></div>
+    <div class=${cx('v-scrim-bottom', fade)} style=${`height:${scrimBottom}px`}></div>
+    ${display !== 'hidden' && html`<div class=${fade}><${CenterState} display=${display === 'playing' ? 'playing' : display} /></div>`}
+    ${!mediaOnly && p.hasControls && html`<${ControlBar} hidden=${hidden} disabled=${display === 'loading' || display === 'error'} type=${cbType} scrubbing=${scrubbing} hasSpeed=${p.cb.hasSpeed} hasRotate=${p.cb.hasRotate}
         hasPreview=${p.cb.hasPreview} hasCounter=${p.cb.hasCounter} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${env.margin}
         maxWidth=${!vertical ? env.controlMaxWidth : null} onScrub=${live.onScrub} onRotate=${env.onRotate} playlist=${env.playlist} filmstrip=${filmstrip} />`}
-    ${!mediaOnly && p.hasSideRail && vertical && !env.railInVerticalBar && html`<${SideRail} rail=${p.rail} right=${Math.max(12, env.margin - 4)}
+    ${!mediaOnly && p.hasSideRail && vertical && !env.railInVerticalBar && html`<${SideRail} hidden=${hidden} rail=${p.rail} right=${Math.max(12, env.margin - 4)}
         bottom=${p.hasControls ? cbHeight + 6 + (p.cb.hasCounter && filmstrip && !scrubbing ? 101 : 0) : 40} />`}
     ${!mediaOnly && html`<div class="v-top" style=${env.statusBar ? '' : `padding-top:${top}px`}>
       ${env.statusBar && html`<${StatusBar} />`}
-      ${p.hasTopBar && html`<${TopBar} margin=${env.margin} trailingInset=${env.trailingInset || 0} centerSlot=${p.topBar.centerSlot} group=${env.group} onGroup=${env.onGroup} />`}
+      ${p.hasTopBar && html`<div class=${cx(fade, 'up')}><${TopBar} margin=${env.margin} trailingInset=${env.trailingInset || 0} centerSlot=${p.topBar.centerSlot} group=${env.group} onGroup=${env.onGroup} /></div>`}
     </div>`}
     <${Toast} top=${!vertical && p.topBar.centerSlot !== 'segmented' ? 16 : top + (p.hasTopBar ? 44 : 0) + 16} />
   </div>`;

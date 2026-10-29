@@ -76,6 +76,16 @@ input { font: inherit; }
 .v-hint { position: absolute; left: 50%; transform: translateX(-50%); height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--black-a64); box-shadow: inset 0 0 0 1px var(--white-a16); white-space: nowrap; }
 .v-hint:active { opacity: .7; }
 
+/* 控件显隐（Spec §12）：淡入淡出 + 4pt 位移，Duration/S 250ms；显示 Easing/Standard，自动隐藏 Easing/Exit */
+.v-fade { transition: opacity 250ms cubic-bezier(.2, 0, 0, 1), transform 250ms cubic-bezier(.2, 0, 0, 1); }
+.v-fade.is-hidden { opacity: 0; pointer-events: none; transition-timing-function: cubic-bezier(.3, 0, 1, 1); }
+.v-fade.is-hidden * { pointer-events: none !important; }
+.v-fade.up.is-hidden { transform: translateY(-4px); }
+.v-fade.down.is-hidden { transform: translateY(4px); }
+/* loading / error：控制栏置灰且不可操作（Spec §7.2） */
+.v-controlbar.is-disabled { opacity: .4; pointer-events: none; }
+.v-controlbar.is-disabled * { pointer-events: none !important; }
+
 /* Video.State */
 .v-center { position: absolute; left: 50%; top: 50%; width: 240px; height: 140px; margin: -70px 0 0 -120px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .v-center > * { pointer-events: auto; }

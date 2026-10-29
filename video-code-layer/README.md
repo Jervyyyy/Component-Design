@@ -12,6 +12,11 @@ Interactive reconstruction of the **Video 视频** component from the TDS Figma 
   ±10 s seek, drag the progress bar (scrubbing readout, brand-colour played segment, frame preview),
   speed cycle 1.0X › 1.25X › 1.5X › 2.0X › 0.75X with toast, mute toast, Rotate-for-fullscreen / Shrink,
   counter filmstrip, SegmentedControl groups.
+- **Controls show/hide (Spec §5.2 / §6 / §12).** Tapping the picture only shows/hides all controls
+  (TopBar, ControlBar + Counter, SideRail, CenterState, scrims) and never plays/pauses. During `playing`
+  the controls auto-hide after 3 s idle (`autoHide`, on by default; any control use or scrub restarts
+  the timer); `paused` / `loading` / `error` / scrubbing keep them visible. Fade 250 ms with a 4 pt shift;
+  the hidden state survives rotate / fold / resize. Loading and error grey out the ControlBar.
 - **Devices.** iPhone (portrait / landscape), **iPhone Duo** postures A–E from the
   "Video · iPhone Duo 适配" page (outer 466×678 with Vertical Bar, inner portrait with reserved area,
   inner landscape, tabletop, book), and **Resizable** — drag the window edges; orientation,

@@ -38,7 +38,7 @@ const RZ_PRESETS = [
   ['Duo 内屏横', 951, 669], ['Flip 外屏', 360, 420], ['平板', 1024, 768], ['分屏小窗', 520, 440],
 ];
 
-export function Panel({ st, set, resolved, scrubbing, ps }) {
+export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
   const f = resolved.forced;
   const cb = (patch) => set((o) => ({ cb: { ...o.cb, ...patch } }));
   const rail = (patch) => set((o) => ({ rail: { ...o.rail, ...patch } }));
@@ -79,6 +79,7 @@ export function Panel({ st, set, resolved, scrubbing, ps }) {
       <//>
       <${Row} label="hasTopBar"><${Switch} on=${st.hasTopBar} onChange=${(v) => set({ hasTopBar: v })} /><//>
       <${Row} label="hasControls"><${Switch} on=${st.hasControls} onChange=${(v) => set({ hasControls: v })} /><//>
+      <${Row} label="autoHide" live=${controlsHidden ? '清屏中' : null} sub="playing 3s 无操作清屏；单击画面显隐，不暂停"><${Switch} on=${st.autoHide} onChange=${(v) => set({ autoHide: v })} /><//>
       <${Row} label="hasSideRail" forced=${f.hasSideRail} sub="UGC / 内容浏览类产线开启"><${Switch} on=${st.hasSideRail} onChange=${(v) => set({ hasSideRail: v })} /><//>
     <//>
 
