@@ -17,10 +17,10 @@ export function Switch({ on, onChange, disabled }) {
   return html`<button class=${cx('switch', on && 'on')} role="switch" aria-checked=${on} disabled=${disabled} onClick=${() => onChange(!on)}></button>`;
 }
 
-function Row({ label, sub, children, forced, live, disabled }) {
-  return html`<div class=${cx('row', disabled && 'disabled')}>
-    <div class="lbl">${label}${live && html`<span class="pill live">${live}</span>`}${forced && html`<span class="pill" title=${forced}>规则</span>`}
-      ${(sub || forced) && html`<small>${forced || sub}</small>`}
+function Row({ label, sub, tip, children, forced, live, disabled }) {
+  return html`<div class=${cx('row', disabled && 'disabled')} title=${forced || tip || ''}>
+    <div class="lbl">${label}${live && html`<span class="pill live">${live}</span>`}${forced && html`<span class="pill">规则</span>`}
+      ${sub && html`<small>${sub}</small>`}
     </div>
     ${children}
   </div>`;
@@ -72,63 +72,63 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
     <div class="panel-head">
       <div class="brand">Trip.com · TDS</div>
       <div class="panel-title"><b>Video 视频</b><span class="t-body-s" style="color:var(--text-tertiary)">Code Layer · 交互还原</span></div>
-      <div class="panel-sub t-body-s">左侧属性与 Figma 组件属性一一对应；右侧 Demo 顶部切换设备与窗口尺寸，画面可直接点击、拖动进度条。</div>
+      <div class="panel-sub t-body-s">属性与 Figma 组件一一对应，悬停查看说明。</div>
     </div>
 
     <${Sec} name="Video" cn="主组件" tag="Video">
-      <${Row} label="orientation" forced=${f.orientation} sub=${st.device === 'iphone' ? '由设备旋转决定' : null}>
+      <${Row} label="orientation" forced=${f.orientation} tip=${st.device === 'iphone' ? '由设备旋转决定' : null}>
         <${Seg} value=${eff.orientation} disabled=${st.device !== 'iphone'} onChange=${(v) => set({ iphoneOrient: v })} options=${['vertical', 'horizontal']} />
       <//>
-      <${Row} label="state" live=${ps.playing ? 'playing' : null} sub="单击画面切换；与中心播放键、控制栏图标联动">
+      <${Row} label="state" live=${ps.playing ? 'playing' : null} tip="单击画面切换；与中心播放键、控制栏图标联动">
         <${Seg} value=${ps.playing ? 'playing' : 'paused'} onChange=${(v) => player.setPlaying(v === 'playing')} options=${['paused', 'playing']} />
       <//>
       <${Row} label="hasTopBar"><${Switch} on=${st.hasTopBar} onChange=${(v) => set({ hasTopBar: v })} /><//>
       <${Row} label="hasControls"><${Switch} on=${st.hasControls} onChange=${(v) => set({ hasControls: v })} /><//>
-      <${Row} label="autoHide" live=${controlsHidden ? '清屏中' : null} sub="playing 3s 无操作清屏；清屏时单击先唤起，再单击暂停"><${Switch} on=${st.autoHide} onChange=${(v) => set({ autoHide: v })} /><//>
-      <${Row} label="hasSideRail" forced=${f.hasSideRail} sub="UGC / 内容浏览类产线开启"><${Switch} on=${st.hasSideRail} onChange=${(v) => set({ hasSideRail: v })} /><//>
+      <${Row} label="autoHide" live=${controlsHidden ? '清屏中' : null} sub="3s 清屏" tip="playing 3s 无操作清屏；清屏时单击先唤起，再单击暂停"><${Switch} on=${st.autoHide} onChange=${(v) => set({ autoHide: v })} /><//>
+      <${Row} label="hasSideRail" forced=${f.hasSideRail} tip="UGC / 内容浏览类产线开启"><${Switch} on=${st.hasSideRail} onChange=${(v) => set({ hasSideRail: v })} /><//>
     <//>
 
     <${Sec} name="Media" cn="画面区" tag=${vertical ? '.Video.MediaPortrait' : '.Video.MediaLandscape'}>
-      <${Row} label="ratio" sub=${vertical ? (st.ratio === '9:16' ? '顶部对齐，底部留 76pt' : st.ratio === '3:4' ? '宽度撑满，垂直居中' : '垂直居中，下方 16pt 自带 Rotate 按钮') : '高度撑满，水平居中'}>
+      <${Row} label="ratio" tip=${vertical ? (st.ratio === '9:16' ? '顶部对齐，底部留 76pt' : st.ratio === '3:4' ? '宽度撑满，垂直居中' : '垂直居中，下方 16pt 自带 Rotate 按钮') : '高度撑满，水平居中'}>
         <${Seg} value=${st.ratio} onChange=${(v) => set({ ratio: v })} options=${['9:16', '3:4', '16:9']} />
       <//>
     <//>
 
     <${Sec} name="Video.State" cn="播放状态层" tag="CenterState">
-      <${Row} label="state" live=${centerNow} sub="auto 跟随播放器；loading / error 在实例面板直接切换">
+      <${Row} label="state" live=${centerNow} tip="auto 跟随播放器；loading / error 在实例面板直接切换">
         <${Seg} value=${st.centerOverride} onChange=${(v) => set({ centerOverride: v })} options=${[['auto', 'auto'], ['loading', 'loading'], ['error', 'error']]} />
       <//>
-      <${Row} label="hasSeek" sub=${st.hasSeek === 'auto' ? `auto → ${vertical ? '竖屏不显示' : '横屏显示'} ±10s` : 'paused 时播放键两侧 ±10s'}>
+      <${Row} label="hasSeek" sub="±10s" tip="paused 时播放键两侧 ±10s；auto = 竖屏隐藏、横屏显示">
         <${Seg} value=${st.hasSeek} onChange=${(v) => set({ hasSeek: v })} options=${[['auto', 'auto'], ['on', 'on'], ['off', 'off']]} />
       <//>
     <//>
 
     <${Sec} name="Video.ControlBar" cn="播放控制栏" tag=${'type=' + cbTypeNow}>
-      <${Row} label="type" sub=${st.cb.type === 'auto' ? `auto → ${cbTypeNow}（竖屏 minimal / 横屏 standard）` : null}>
+      <${Row} label="type" sub=${st.cb.type === 'auto' ? `→ ${cbTypeNow}` : null} tip="auto：竖屏 minimal / 横屏 standard">
         <${Seg} value=${st.cb.type} onChange=${(v) => cb({ type: v })} options=${['auto', 'minimal', 'standard']} />
       <//>
-      <${Row} label="state" live=${scrubbing ? 'dragging' : null} sub="拖动进度条即进入 scrubbing">
+      <${Row} label="state" live=${scrubbing ? 'dragging' : null} tip="拖动进度条即进入 scrubbing">
         <${Seg} value=${scrubbing ? 'scrubbing' : st.cb.state} onChange=${(v) => cb({ state: v })} options=${['default', 'scrubbing']} />
       <//>
-      <${Row} label="hasSpeed" forced=${f['cb.hasSpeed']} sub="1.0X › 1.25X › 1.5X › 2.0X › 0.75X"><${Switch} on=${st.cb.hasSpeed} onChange=${(v) => cb({ hasSpeed: v })} /><//>
-      <${Row} label="hasRotate" forced=${f['cb.hasRotate']} sub="standard 右端 Shrink 图标"><${Switch} on=${st.cb.hasRotate} onChange=${(v) => cb({ hasRotate: v })} /><//>
-      <${Row} label="hasPreview" sub="scrubbing 时的画面缩略预览"><${Switch} on=${st.cb.hasPreview} onChange=${(v) => cb({ hasPreview: v })} /><//>
-      <${Row} label="hasCounter" sub="多素材计数：胶片条 + 数量标记"><${Switch} on=${st.cb.hasCounter} onChange=${(v) => cb({ hasCounter: v })} /><//>
+      <${Row} label="hasSpeed" forced=${f['cb.hasSpeed']} tip="1.0X › 1.25X › 1.5X › 2.0X › 0.75X"><${Switch} on=${st.cb.hasSpeed} onChange=${(v) => cb({ hasSpeed: v })} /><//>
+      <${Row} label="hasRotate" forced=${f['cb.hasRotate']} tip="standard 右端 Shrink 图标"><${Switch} on=${st.cb.hasRotate} onChange=${(v) => cb({ hasRotate: v })} /><//>
+      <${Row} label="hasPreview" tip="scrubbing 时的画面缩略预览"><${Switch} on=${st.cb.hasPreview} onChange=${(v) => cb({ hasPreview: v })} /><//>
+      <${Row} label="hasCounter" tip="多素材计数：胶片条 + 数量标记"><${Switch} on=${st.cb.hasCounter} onChange=${(v) => cb({ hasCounter: v })} /><//>
     <//>
 
     <${Sec} name="Video.ProgressBar" cn="进度条">
-      <${Row} label="hasChapters" sub="轨道上展示章节锚点"><${Switch} on=${st.pb.hasChapters} onChange=${(v) => set({ pb: { hasChapters: v } })} /><//>
+      <${Row} label="hasChapters" tip="轨道上展示章节锚点"><${Switch} on=${st.pb.hasChapters} onChange=${(v) => set({ pb: { hasChapters: v } })} /><//>
     <//>
 
     <${Sec} name="Video.TopBar" cn="顶部栏">
-      <${Row} label="centerSlot" forced=${f['topBar.centerSlot']} sub="SegmentedControl 分组切换">
+      <${Row} label="centerSlot" forced=${f['topBar.centerSlot']} tip="SegmentedControl 分组切换">
         <${Seg} value=${st.topBar.centerSlot} onChange=${(v) => set({ topBar: { centerSlot: v } })} options=${[['empty', '留空'], ['segmented', 'SegmentedControl']]} />
       <//>
     <//>
 
     <${Sec} name="Video.SideRail" cn="侧边互动栏" tag=${eff.hasSideRail && vertical ? 'visible' : 'hidden'}>
-      ${[['hasCreator', '创作者头像与关注'], ['hasLike', '点赞'], ['hasComment', '评论'], ['hasFavorite', '收藏'], ['hasShare', '分享'], ['hasMenu', '目录']].map(([k, sub]) => html`<${Row} label=${k} sub=${sub}><${Switch} on=${st.rail[k]} onChange=${(v) => rail({ [k]: v })} /><//>`)}
-      ${[['Like', 'likeCount'], ['Comment', 'commentCount'], ['Favorite', 'favoriteCount']].map(([n, key]) => html`<${Row} label=${'has' + n + 'Count'} sub="计数为 0 或拿不到时关闭，不要显示 0">
+      ${[['hasCreator', '创作者头像与关注'], ['hasLike', '点赞'], ['hasComment', '评论'], ['hasFavorite', '收藏'], ['hasShare', '分享'], ['hasMenu', '目录']].map(([k, sub]) => html`<${Row} label=${k} tip=${sub}><${Switch} on=${st.rail[k]} onChange=${(v) => rail({ [k]: v })} /><//>`)}
+      ${[['Like', 'likeCount'], ['Comment', 'commentCount'], ['Favorite', 'favoriteCount']].map(([n, key]) => html`<${Row} label=${'has' + n + 'Count'} tip="计数为 0 或拿不到时关闭，不要显示 0">
         <span style="display:flex;gap:8px;align-items:center">
           <input class="txt" value=${st.rail[key]} disabled=${!st.rail['has' + n + 'Count']} onInput=${(e) => rail({ [key]: e.target.value })} aria-label=${key} />
           <${Switch} on=${st.rail['has' + n + 'Count']} onChange=${(v) => rail({ ['has' + n + 'Count']: v })} />
