@@ -23,12 +23,13 @@ export const CLASS_LABEL = { phone: '手机规则', large: '大屏规则 · 展�
 
 /**
  * Resolve the TDS props the panel asked for into the props the component actually renders in this
- * window, plus a list of the rules that changed something (shown in the panel).
+ * window, plus the capabilities that don't exist in this window (`na`, hidden in the panel) and notes.
  * kind: 'iphone' | 'duo' | 'resizable'
  */
 export function resolve(state, { kind, w, h, posture }) {
   const cls = kind === 'iphone' ? 'phone' : windowClass(w, h);
-  const forced = {}; // prop path → reason
+  // prop path → why that capability doesn't exist in this window; the panel hides these rows
+  const na = {};
   const notes = [];
 
   let orientation;
@@ -36,7 +37,7 @@ export function resolve(state, { kind, w, h, posture }) {
   else {
     orientation = w >= h ? 'horizontal' : 'vertical';
     notes.push(`orientation = ${orientation}（窗口 ${Math.round(w)}×${Math.round(h)}，宽 ${w >= h ? '≥' : '<'} 高）`);
-    forced.orientation = '跟随窗口宽高比';
+    na.orientation = '跟随窗口宽高比';
   }
   const vertical = orientation === 'vertical';
 
@@ -45,20 +46,28 @@ export function resolve(state, { kind, w, h, posture }) {
     if (kind === 'resizable' && cls === 'large') { cb.type = 'standard'; notes.push('ControlBar type = standard（大屏控制栏统一 standard）'); }
     else cb.type = vertical ? 'minimal' : 'standard';
   }
-  if (cls === 'large' && cb.hasRotate) { cb.hasRotate = false; forced['cb.hasRotate'] = '大屏规则：hasRotate=false'; }
+  if (cls === 'large') na['cb.hasRotate'] = '大屏规则：hasRotate=false';
   if (cls === 'small') {
-    if (cb.hasSpeed) { cb.hasSpeed = false; forced['cb.hasSpeed'] = '小窗口：关闭 hasSpeed'; }
-    if (cb.hasRotate) { cb.hasRotate = false; forced['cb.hasRotate'] = '小窗口：关闭 hasRotate'; }
+    na['cb.hasSpeed'] = '小窗口：关闭 hasSpeed';
+    na['cb.hasRotate'] = '小窗口：关闭 hasRotate';
   }
-  if (kind === 'duo' && cb.hasRotate) { cb.hasRotate = false; forced['cb.hasRotate'] = 'Duo：外屏横握禁用 / 内屏按大屏规则'; }
+  if (kind === 'duo') na['cb.hasRotate'] = 'Duo：外屏横握禁用 / 内屏按大屏规则';
+  if (cb.type === 'minimal' && !na['cb.hasRotate']) na['cb.hasRotate'] = 'minimal 控制栏没有 Rotate 按钮';
+  if (posture === 'D') {
+    na['cb.hasCounter'] = '桌面模式：下半屏放信息与选集，不用 Counter';
+    na.autoHide = '桌面模式：控件在下半屏常驻，不清屏';
+  }
+  if (na['cb.hasSpeed']) cb.hasSpeed = false;
+  if (na['cb.hasRotate']) cb.hasRotate = false;
+  if (na['cb.hasCounter']) cb.hasCounter = false;
 
-  let hasSideRail = state.hasSideRail;
-  if (hasSideRail && cls === 'small') { hasSideRail = false; forced.hasSideRail = '小窗口：hasSideRail=false'; }
-  if (hasSideRail && posture === 'D') { hasSideRail = false; forced.hasSideRail = '桌面模式：hasSideRail=false'; }
-  if (state.hasSideRail && !vertical && !forced.hasSideRail) forced.hasSideRail = '横屏不使用侧边栏';
+  if (cls === 'small') na.hasSideRail = '小窗口：hasSideRail=false';
+  else if (posture === 'D') na.hasSideRail = '桌面模式：hasSideRail=false';
+  else if (!vertical) na.hasSideRail = '横屏不使用侧边栏';
+  const hasSideRail = state.hasSideRail && !na.hasSideRail;
 
   const topBar = { ...state.topBar };
-  if (cls === 'small' && topBar.centerSlot !== 'empty') { topBar.centerSlot = 'empty'; forced['topBar.centerSlot'] = '小窗口：centerSlot 留空'; }
+  if (cls === 'small') { topBar.centerSlot = 'empty'; na['topBar.centerSlot'] = '小窗口：centerSlot 留空'; }
 
   const rotateHint = kind === 'iphone' || (kind === 'resizable' && cls === 'phone');
   if (vertical && state.ratio === '16:9' && !rotateHint) notes.push('「Rotate for fullscreen」不出现（大屏 / Duo 外屏横握已禁用）');
@@ -70,8 +79,8 @@ export function resolve(state, { kind, w, h, posture }) {
   if (cls === 'large' && !vertical) notes.push('横屏控制栏最大宽度 1024pt 居中');
 
   return {
-    cls, forced, notes,
-    p: { ...state, orientation, cb, hasSideRail, topBar },
+    cls, na, notes,
+    p: { ...state, orientation, cb, hasSideRail, topBar, autoHide: state.autoHide && !na.autoHide },
     env: { margin, rotateHint, controlMaxWidth: cls === 'large' ? 1024 : null },
   };
 }

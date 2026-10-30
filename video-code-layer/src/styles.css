@@ -246,6 +246,7 @@ input { font: inherit; }
 .rules .kv { display: grid; grid-template-columns: 92px 1fr; gap: 2px 8px; }
 .rules .kv b { font-weight: 500; color: var(--text-primary); }
 .rules ul { margin: 8px 0 0; padding-left: 16px; }
+.rules code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--text-primary); }
 .note { font-size: 11px; line-height: 1.5; color: var(--text-tertiary); margin-top: 10px; }
 .note a { color: var(--text-brand); text-decoration: none; }
 

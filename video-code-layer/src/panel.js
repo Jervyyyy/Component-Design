@@ -17,9 +17,11 @@ export function Switch({ on, onChange, disabled }) {
   return html`<button class=${cx('switch', on && 'on')} role="switch" aria-checked=${on} disabled=${disabled} onClick=${() => onChange(!on)}></button>`;
 }
 
-function Row({ label, sub, tip, children, forced, live, disabled }) {
-  return html`<div class=${cx('row', disabled && 'disabled')} title=${forced || tip || ''}>
-    <div class="lbl">${label}${live && html`<span class="pill live">${live}</span>`}${forced && html`<span class="pill">规则</span>`}
+// `na`: the capability doesn't exist in the current window/posture → the row isn't rendered
+function Row({ label, sub, tip, children, na, live, disabled }) {
+  if (na) return null;
+  return html`<div class=${cx('row', disabled && 'disabled')} title=${tip || ''}>
+    <div class="lbl">${label}${live && html`<span class="pill live">${live}</span>`}
       ${sub && html`<small>${sub}</small>`}
     </div>
     ${children}
@@ -60,7 +62,7 @@ export function DeviceBar({ st, set, resolved, scale }) {
 }
 
 export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
-  const f = resolved.forced;
+  const na = resolved.na;
   const cb = (patch) => set((o) => ({ cb: { ...o.cb, ...patch } }));
   const rail = (patch) => set((o) => ({ rail: { ...o.rail, ...patch } }));
   const eff = resolved.p;
@@ -75,17 +77,17 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
       <div class="panel-sub t-body-s">属性与 Figma 组件一一对应，悬停查看说明。</div>
     </div>
 
-    <${Sec} name="Video" cn="主组件" tag="Video">
-      <${Row} label="orientation" forced=${f.orientation} tip=${st.device === 'iphone' ? '由设备旋转决定' : null}>
-        <${Seg} value=${eff.orientation} disabled=${st.device !== 'iphone'} onChange=${(v) => set({ iphoneOrient: v })} options=${['vertical', 'horizontal']} />
+    <${Sec} name="Video" cn="主组件" tag=${na.orientation ? 'orientation=' + eff.orientation : 'Video'}>
+      <${Row} label="orientation" na=${na.orientation} tip="由设备旋转决定">
+        <${Seg} value=${eff.orientation} onChange=${(v) => set({ iphoneOrient: v })} options=${['vertical', 'horizontal']} />
       <//>
       <${Row} label="state" live=${ps.playing ? 'playing' : null} tip="单击画面切换；与中心播放键、控制栏图标联动">
         <${Seg} value=${ps.playing ? 'playing' : 'paused'} onChange=${(v) => player.setPlaying(v === 'playing')} options=${['paused', 'playing']} />
       <//>
       <${Row} label="hasTopBar"><${Switch} on=${st.hasTopBar} onChange=${(v) => set({ hasTopBar: v })} /><//>
       <${Row} label="hasControls"><${Switch} on=${st.hasControls} onChange=${(v) => set({ hasControls: v })} /><//>
-      <${Row} label="autoHide" live=${controlsHidden ? '清屏中' : null} sub="3s 清屏" tip="playing 3s 无操作清屏；清屏时单击先唤起，再单击暂停"><${Switch} on=${st.autoHide} onChange=${(v) => set({ autoHide: v })} /><//>
-      <${Row} label="hasSideRail" forced=${f.hasSideRail} tip="UGC / 内容浏览类产线开启"><${Switch} on=${st.hasSideRail} onChange=${(v) => set({ hasSideRail: v })} /><//>
+      <${Row} label="autoHide" na=${na.autoHide} live=${controlsHidden ? '清屏中' : null} sub="3s 清屏" tip="playing 3s 无操作清屏；清屏时单击先唤起，再单击暂停"><${Switch} on=${st.autoHide} onChange=${(v) => set({ autoHide: v })} /><//>
+      <${Row} label="hasSideRail" na=${na.hasSideRail} tip="UGC / 内容浏览类产线开启"><${Switch} on=${st.hasSideRail} onChange=${(v) => set({ hasSideRail: v })} /><//>
     <//>
 
     <${Sec} name="Media" cn="画面区" tag=${vertical ? '.Video.MediaPortrait' : '.Video.MediaLandscape'}>
@@ -103,30 +105,30 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
       <//>
     <//>
 
-    <${Sec} name="Video.ControlBar" cn="播放控制栏" tag=${'type=' + cbTypeNow}>
+    ${st.hasControls && html`<${Sec} name="Video.ControlBar" cn="播放控制栏" tag=${'type=' + cbTypeNow}>
       <${Row} label="type" sub=${st.cb.type === 'auto' ? `→ ${cbTypeNow}` : null} tip="auto：竖屏 minimal / 横屏 standard">
         <${Seg} value=${st.cb.type} onChange=${(v) => cb({ type: v })} options=${['auto', 'minimal', 'standard']} />
       <//>
       <${Row} label="state" live=${scrubbing ? 'dragging' : null} tip="拖动进度条即进入 scrubbing">
         <${Seg} value=${scrubbing ? 'scrubbing' : st.cb.state} onChange=${(v) => cb({ state: v })} options=${['default', 'scrubbing']} />
       <//>
-      <${Row} label="hasSpeed" forced=${f['cb.hasSpeed']} tip="1.0X › 1.25X › 1.5X › 2.0X › 0.75X"><${Switch} on=${st.cb.hasSpeed} onChange=${(v) => cb({ hasSpeed: v })} /><//>
-      <${Row} label="hasRotate" forced=${f['cb.hasRotate']} tip="standard 右端 Shrink 图标"><${Switch} on=${st.cb.hasRotate} onChange=${(v) => cb({ hasRotate: v })} /><//>
+      <${Row} label="hasSpeed" na=${na['cb.hasSpeed']} tip="1.0X › 1.25X › 1.5X › 2.0X › 0.75X"><${Switch} on=${st.cb.hasSpeed} onChange=${(v) => cb({ hasSpeed: v })} /><//>
+      <${Row} label="hasRotate" na=${na['cb.hasRotate']} tip="standard 右端 Shrink 图标"><${Switch} on=${st.cb.hasRotate} onChange=${(v) => cb({ hasRotate: v })} /><//>
       <${Row} label="hasPreview" tip="scrubbing 时的画面缩略预览"><${Switch} on=${st.cb.hasPreview} onChange=${(v) => cb({ hasPreview: v })} /><//>
-      <${Row} label="hasCounter" tip="多素材计数：胶片条 + 数量标记"><${Switch} on=${st.cb.hasCounter} onChange=${(v) => cb({ hasCounter: v })} /><//>
+      <${Row} label="hasCounter" na=${na['cb.hasCounter']} tip="多素材计数：胶片条 + 数量标记"><${Switch} on=${st.cb.hasCounter} onChange=${(v) => cb({ hasCounter: v })} /><//>
     <//>
 
     <${Sec} name="Video.ProgressBar" cn="进度条">
       <${Row} label="hasChapters" tip="轨道上展示章节锚点"><${Switch} on=${st.pb.hasChapters} onChange=${(v) => set({ pb: { hasChapters: v } })} /><//>
-    <//>
+    <//>`}
 
-    <${Sec} name="Video.TopBar" cn="顶部栏">
-      <${Row} label="centerSlot" forced=${f['topBar.centerSlot']} tip="SegmentedControl 分组切换">
+    ${st.hasTopBar && !na['topBar.centerSlot'] && html`<${Sec} name="Video.TopBar" cn="顶部栏">
+      <${Row} label="centerSlot" tip="SegmentedControl 分组切换">
         <${Seg} value=${st.topBar.centerSlot} onChange=${(v) => set({ topBar: { centerSlot: v } })} options=${[['empty', '留空'], ['segmented', 'SegmentedControl']]} />
       <//>
-    <//>
+    <//>`}
 
-    <${Sec} name="Video.SideRail" cn="侧边互动栏" tag=${eff.hasSideRail && vertical ? 'visible' : 'hidden'}>
+    ${eff.hasSideRail && html`<${Sec} name="Video.SideRail" cn="侧边互动栏">
       ${[['hasCreator', '创作者头像与关注'], ['hasLike', '点赞'], ['hasComment', '评论'], ['hasFavorite', '收藏'], ['hasShare', '分享'], ['hasMenu', '目录']].map(([k, sub]) => html`<${Row} label=${k} tip=${sub}><${Switch} on=${st.rail[k]} onChange=${(v) => rail({ [k]: v })} /><//>`)}
       ${[['Like', 'likeCount'], ['Comment', 'commentCount'], ['Favorite', 'favoriteCount']].map(([n, key]) => html`<${Row} label=${'has' + n + 'Count'} tip="计数为 0 或拿不到时关闭，不要显示 0">
         <span style="display:flex;gap:8px;align-items:center">
@@ -134,7 +136,7 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
           <${Switch} on=${st.rail['has' + n + 'Count']} onChange=${(v) => rail({ ['has' + n + 'Count']: v })} />
         </span>
       <//>`)}
-    <//>
+    <//>`}
 
     <${Sec} name="Content" cn="素材 · Singapore" tag=${(clipsOf(st.group).findIndex((c) => c.id === ps.clipId) + 1 || '–') + '/' + clipsOf(st.group).length}>
       <div class="clips">${CLIPS.map((c) => html`<button class=${cx('clip', ps.clipId === c.id && 'on')} onClick=${() => { if (!clipsOf(st.group).find((x) => x.id === c.id)) set({ group: 'highlights' }); player.load(c.id); }}>
@@ -151,7 +153,7 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
           <b>ControlBar</b><span>${eff.cb.type}${eff.cb.hasRotate ? ' · hasRotate' : ''}${eff.cb.hasSpeed ? ' · hasSpeed' : ''}</span>
           <b>播放</b><span>${fmtTime(player.t)} / ${fmtTime(ps.duration)} · ${speedLabel(ps.rate)}${ps.muted ? ' · Muted' : ''}</span>
         </div>
-        <ul>${resolved.notes.map((n) => html`<li>${n}</li>`)}${Object.values(f).map((n) => html`<li>${n}</li>`)}</ul>
+        <ul>${resolved.notes.map((n) => html`<li>${n}</li>`)}${Object.entries(na).map(([k, n]) => html`<li>隐藏 <code>${k.split('.').pop()}</code>：${n}</li>`)}</ul>
       </div>
     <//>
   </aside>`;
