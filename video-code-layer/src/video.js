@@ -317,10 +317,10 @@ export function Video({ p, env, live }) {
   const cbHeight = cbType === 'minimal' ? 88 : 76;
   const top = env.statusBar ? 62 : env.topInset;
   const filmstrip = vertical && p.ratio === '16:9';
-  // 控件显隐（Spec §5.2 / §6 / §12）：
-  //  · 单击画面只显隐全部可见控件，不改变播放状态；播放/暂停只由固定按钮负责
+  // 控件显隐与单击画面（Spec §5.2 / §6 / §12，2026-10-30 修订）：
+  //  · 单击画面切换播放 / 暂停；控件处于隐藏时，第一下只唤起控件，不改变播放状态
   //  · playing 默认 3s 无操作自动隐藏；任何控件操作、拖动进度后重新计时
-  //  · paused / loading / error / scrubbing 时控件常显（单击画面不隐藏）
+  //  · paused / loading / error / scrubbing 时控件常显
   //  · 显隐状态由外层持有，旋转、折叠、改变窗口尺寸时保持不变
   const forceShow = display !== 'playing' || scrubbing;
   const hidden = !mediaOnly && live.controlsHidden && !forceShow;
@@ -337,8 +337,8 @@ export function Video({ p, env, live }) {
   const fade = cx('v-fade', hidden && 'is-hidden');
   const onPointerDown = () => { if (!hidden) arm(); };
   const tap = () => {
-    if (forceShow || mediaOnly) return;
-    live.setControlsHidden(!hidden);
+    if (hidden) { live.setControlsHidden(false); return; }
+    if (display === 'playing' || display === 'paused') player.toggle();
   };
   const scrimTop = vertical ? 140 : 96, scrimBottom = vertical ? 220 : 160;
 
