@@ -2,7 +2,7 @@ import { html, render, useState, useEffect, useRef, useLayoutEffect, cx, fmtTime
 import { Icon, RawSvg, DUO_LEVELS, STATUS_ICONS } from './icons.js';
 import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
-import { Video, TopBar, ControlBar, CenterState, SideRail } from './video.js';
+import { Video, TopBar, ControlBar, CenterState, SideRail, seekShown } from './video.js';
 import { resolve, CLASS_LABEL, DUO } from './rules.js';
 import { Panel, DeviceBar } from './panel.js';
 
@@ -20,6 +20,7 @@ export const DEFAULTS = {
   autoHide: true,            // 播放时 3 秒无操作隐藏控件（行为规范，非 Figma 变体）
   ratio: '9:16',             // Media › ratio
   centerOverride: 'auto',    // CenterState instance: auto | loading | error
+  hasSeek: 'auto',          // paused 时 ±10s：auto（竖屏隐藏 / 横屏显示）| on | off
   cb: { type: 'auto', state: 'default', hasSpeed: true, hasRotate: true, hasPreview: false, hasCounter: false },
   pb: { hasChapters: false },
   topBar: { centerSlot: 'empty' },
@@ -187,7 +188,7 @@ function CenterStateLive({ p }) {
   if (s.loading) d = 'loading';
   if (s.error) d = 'error';
   if (p.centerOverride !== 'auto') d = p.centerOverride;
-  return html`<div style="position:absolute;inset:0" onClick=${() => (d === 'playing' || d === 'paused') && player.toggle()}><${CenterState} display=${d} /></div>`;
+  return html`<div style="position:absolute;inset:0" onClick=${() => (d === 'playing' || d === 'paused') && player.toggle()}><${CenterState} display=${d} seek=${seekShown(p)} /></div>`;
 }
 
 function Resizable({ st, set, live, scale }) {

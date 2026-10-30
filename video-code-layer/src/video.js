@@ -7,6 +7,8 @@ import { CLIPS, GROUPS } from './media.js';
 
 const RATIO = { '9:16': 9 / 16, '3:4': 3 / 4, '16:9': 16 / 9 };
 export const AUTO_HIDE_MS = 3000; // 播放时控件自动隐藏延时
+// hasSeek: auto → 竖屏隐藏、横屏显示 ±10s；on / off 强制
+export const seekShown = (p) => (p.hasSeek === 'auto' ? p.orientation === 'horizontal' : p.hasSeek === 'on');
 
 // ---------------------------------------------------------------------------------------------
 // Toast (Feedback Toast 反馈浮层 — spec only: 8 radius, 12 padding, Body/M, 16pt from top)
@@ -66,14 +68,15 @@ function MediaFrame({ rect, onTap }) {
 // ---------------------------------------------------------------------------------------------
 // Video.State (CenterState) — 240×140, identical size in every state so the frame never jumps
 // ---------------------------------------------------------------------------------------------
-export function CenterState({ display, style = '' }) {
+export function CenterState({ display, seek = true, style = '' }) {
   const stop = (e) => e.stopPropagation();
   let body = null;
   if (display === 'paused') {
+    // ±10s 快退 / 快进：默认仅横屏显示，竖屏只保留固定播放键（2026-10-30）
     body = html`<div class="vs-row">
-      <button class="vs-seek" aria-label="Back 10s" onClick=${(e) => { stop(e); player.skip(-10); }}><${Icon} name="backword_10" size=${32} /></button>
+      ${seek && html`<button class="vs-seek" aria-label="Back 10s" onClick=${(e) => { stop(e); player.skip(-10); }}><${Icon} name="backword_10" size=${32} /></button>`}
       <button class="vib-large" aria-label="Play" onClick=${(e) => { stop(e); player.play(); }}><${Icon} name="play" size=${48} /></button>
-      <button class="vs-seek" aria-label="Forward 10s" onClick=${(e) => { stop(e); player.skip(10); }}><${Icon} name="forward_10" size=${32} /></button>
+      ${seek && html`<button class="vs-seek" aria-label="Forward 10s" onClick=${(e) => { stop(e); player.skip(10); }}><${Icon} name="forward_10" size=${32} /></button>`}
     </div>`;
   } else if (display === 'loading') {
     body = html`<div class="vs-col gap8"><${Icon} name="loading_ios" size=${24} cls="spin" /><span class="t-body-m vs-dim">Loading…</span></div>`;
@@ -349,7 +352,7 @@ export function Video({ p, env, live }) {
     </button>`}
     <div class=${cx('v-scrim-top', fade)} style=${`height:${scrimTop}px`}></div>
     <div class=${cx('v-scrim-bottom', fade)} style=${`height:${scrimBottom}px`}></div>
-    ${display !== 'hidden' && html`<div class=${fade}><${CenterState} display=${display === 'playing' ? 'playing' : display} /></div>`}
+    ${display !== 'hidden' && html`<div class=${fade}><${CenterState} display=${display === 'playing' ? 'playing' : display} seek=${seekShown(p)} /></div>`}
     ${!mediaOnly && p.hasControls && html`<${ControlBar} hidden=${hidden} disabled=${display === 'loading' || display === 'error'} type=${cbType} scrubbing=${scrubbing} hasSpeed=${p.cb.hasSpeed} hasRotate=${p.cb.hasRotate}
         hasPreview=${p.cb.hasPreview} hasCounter=${p.cb.hasCounter} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${env.margin}
         maxWidth=${!vertical ? env.controlMaxWidth : null} onScrub=${live.onScrub} onRotate=${env.onRotate} playlist=${env.playlist} filmstrip=${filmstrip} />`}

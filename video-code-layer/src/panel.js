@@ -98,6 +98,9 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
       <${Row} label="state" live=${centerNow} sub="auto 跟随播放器；loading / error 在实例面板直接切换">
         <${Seg} value=${st.centerOverride} onChange=${(v) => set({ centerOverride: v })} options=${[['auto', 'auto'], ['loading', 'loading'], ['error', 'error']]} />
       <//>
+      <${Row} label="hasSeek" sub=${st.hasSeek === 'auto' ? `auto → ${vertical ? '竖屏不显示' : '横屏显示'} ±10s` : 'paused 时播放键两侧 ±10s'}>
+        <${Seg} value=${st.hasSeek} onChange=${(v) => set({ hasSeek: v })} options=${[['auto', 'auto'], ['on', 'on'], ['off', 'off']]} />
+      <//>
     <//>
 
     <${Sec} name="Video.ControlBar" cn="播放控制栏" tag=${'type=' + cbTypeNow}>

@@ -5,7 +5,7 @@ Interactive reconstruction of the **Video 视频** component from the TDS Figma 
 
 - **Left — control panel.** Every control is a TDS component property with its Figma name:
   `Video` (orientation, state, hasTopBar, hasControls, hasSideRail), `Media › ratio`,
-  `Video.State` (CenterState auto / loading / error), `Video.ControlBar` (type, state, hasSpeed, hasRotate,
+  `Video.State` (CenterState auto / loading / error, hasSeek: ±10 s shown in landscape only by default), `Video.ControlBar` (type, state, hasSpeed, hasRotate,
   hasPreview, hasCounter), `Video.ProgressBar` (hasChapters), `Video.TopBar` (centerSlot),
   `Video.SideRail` (6 items, 3 counts + values). A **Rules** block shows which window rule changed a prop.
 - **Right — live demo.** Real playback (Singapore footage, see `CREDITS.md`), tap to play/pause,
