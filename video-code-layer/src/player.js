@@ -94,6 +94,18 @@ class Player {
 
   retry() { this.blobs.delete(this.s.clipId); this.load(this.s.clipId); }
 
+  // Video.State error set from the panel: behave like a clip that failed to load —
+  // no frame, no source, nothing played or buffered.
+  fail() {
+    ++this.token;
+    this.fetching = false;
+    this.video.pause();
+    this.video.removeAttribute('src');
+    this.video.load();
+    this.t = 0; this.emitTime();
+    this.set({ loading: false, error: true, playing: false });
+  }
+
   // --- transport ----------------------------------------------------------------------------
   _play() {
     const p = this.video.play();
@@ -108,7 +120,7 @@ class Player {
       });
     }
   }
-  play() { this.set({ playing: true }); if (!this.fetching && !this.s.error) this._play(); }
+  play() { if (this.s.error) return; this.set({ playing: true }); if (!this.fetching) this._play(); }
   pause() { this.set({ playing: false }); this.video.pause(); }
   toggle() { this.s.playing ? this.pause() : this.play(); }
   setPlaying(on) { on ? this.play() : this.pause(); }
@@ -149,7 +161,7 @@ class Player {
     // Clips are fully fetched (blob) so the real buffer is always 100%. To keep the TDS
     // "Buffered" layer meaningful we show a rolling read-ahead window like a streaming player.
     const d = this.s.duration || 0;
-    if (!d || this.s.loading) return 0;
+    if (!d || this.s.loading || this.s.error) return 0;
     return Math.min(d, this.t + Math.max(4, d * 0.3));
   }
 }

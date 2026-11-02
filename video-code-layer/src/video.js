@@ -59,8 +59,9 @@ function MediaFrame({ rect, onTap }) {
   const s = usePlayer();
   const clip = CLIPS.find((c) => c.id === s.clipId);
   useLayoutEffect(() => { host.current.appendChild(player.video); }, []);
-  return html`<div class="v-media" style=${`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px`} onClick=${onTap}>
-    <img class="v-poster" src=${clip.poster} alt="" draggable="false" />
+  // error = 视频未加载：画面区只留黑底，不显示封面或残留帧
+  return html`<div class=${cx('v-media', s.error && 'is-empty')} style=${`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px`} onClick=${onTap}>
+    ${!s.error && html`<img class="v-poster" src=${clip.poster} alt="" draggable="false" />`}
     <div class="v-media-host" ref=${host}></div>
   </div>`;
 }
@@ -168,7 +169,7 @@ function TimeText() {
   const t = usePlayerTime();
   const s = usePlayer();
   return html`<div class="vc-time t-body-xs-em">
-    <span>${fmtTime(t)}</span><i class="vc-div"></i><span class="dim">${fmtTime(s.duration)}</span>
+    <span>${fmtTime(t)}</span><i class="vc-div"></i><span class="dim">${s.error ? '--:--' : fmtTime(s.duration)}</span>
   </div>`;
 }
 
@@ -176,7 +177,7 @@ function Readout() {
   const t = usePlayerTime();
   const s = usePlayer();
   return html`<div class="vc-readout t-heading-2xl">
-    <span>${fmtTime(t)}</span><i class="vc-div-lg"></i><span class="dim">${fmtTime(s.duration)}</span>
+    <span>${fmtTime(t)}</span><i class="vc-div-lg"></i><span class="dim">${s.error ? '--:--' : fmtTime(s.duration)}</span>
   </div>`;
 }
 

@@ -232,6 +232,14 @@ function App() {
   const scaleRef = useRef(1);
 
   useEffect(() => { player.load(CLIPS[0].id, { keepPlaying: false }); }, []);
+  // Video.State = error 对应视频未加载：画面清空、进度归零；离开 error 时重新加载当前视频
+  const prevOverride = useRef(st.centerOverride);
+  useEffect(() => {
+    const was = prevOverride.current;
+    prevOverride.current = st.centerOverride;
+    if (st.centerOverride === 'error') player.fail();
+    else if (was === 'error' && player.s.error) player.retry();
+  }, [st.centerOverride]);
   useEffect(() => {
     const f = () => set({ centerOverride: 'auto' });
     window.addEventListener('tds-retry', f);
