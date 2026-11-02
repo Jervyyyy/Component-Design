@@ -320,21 +320,11 @@ input { font: inherit; }
 .rz-size { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .rz-size em { font-style: normal; color: var(--text-brand); margin-left: 6px; font-weight: 500; }
 
-/* ---- Duo 书本态 · NavigationSplitView (Primary 播放器 | Secondary 评论 | Vertical Bar) ---- */
-.book-hinge { position: absolute; left: 476px; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.12); z-index: 2; }
-.book-secondary { left: 476px; top: 0; width: 391px; height: 669px; }
-.book-details { padding: 24px 12px 0 24px; }
-.book-details .meta { color: rgba(255,255,255,.6); margin-top: 8px; }
-.book-open-comments { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 20px; padding: 12px 0; border-top: .5px solid rgba(255,255,255,.2); border-bottom: .5px solid rgba(255,255,255,.2); color: #fff; text-align: left; }
-.book-open-comments .ic:last-child { margin-left: auto; color: rgba(255,255,255,.6); }
-.list-item.dark { border-bottom-color: rgba(255,255,255,.2); color: #fff; }
-.list-item.dark .li-text span, .list-item.dark .ic:last-child { color: rgba(255,255,255,.6); }
+/* ---- Duo 内屏横握分栏 · 评论区 ---- */
 
 .cm-pane { position: absolute; inset: 0; display: flex; flex-direction: column; color: #fff; }
 .cm-head { flex: none; display: flex; align-items: flex-start; gap: 12px; height: 36px; margin: 24px 0 0 var(--cm-inset, 12px); width: 380px; padding-left: 12px; border-bottom: 1px solid rgba(255,255,255,.24); }
 .cm-close { width: 24px; height: 24px; color: #fff; }
-.cm-head.no-close { height: 32px; }
-.cm-head.no-close .cm-title { margin-top: 0; }
 .cm-title { margin-top: 2px; font-size: 16px; line-height: 20px; font-weight: 700; }
 .cm-list { flex: 1; min-height: 0; overflow-y: auto; margin-left: var(--cm-inset, 12px); width: 380px; scrollbar-width: none; overscroll-behavior: contain; }
 .cm-list::-webkit-scrollbar { display: none; }

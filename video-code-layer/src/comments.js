@@ -1,4 +1,4 @@
-// Duo 书本态 secondary pane: Comments (Figma › Video › Screen · book, Comment.Item instances).
+// Duo 内屏横握分栏的评论区: Comments (Figma › Video › Comment.Item instances).
 // Avatars exported from the same frame into assets/avatars/.
 import { html, useState, cx } from './lib.js';
 import { Icon } from './icons.js';
@@ -48,9 +48,8 @@ function CommentItem({ c, last }) {
 
 // Comments sent in the demo survive closing and reopening the pane
 let sent = [];
-export const commentCount = () => sent.length + COMMENTS.length;
 
-export function CommentsPane({ onClose, inset = 12, closable = true }) {
+export function CommentsPane({ onClose, inset = 12 }) {
   const [mine, setMine] = useState(sent);
   const [draft, setDraft] = useState('');
   const list = [...mine, ...COMMENTS];
@@ -63,8 +62,8 @@ export function CommentsPane({ onClose, inset = 12, closable = true }) {
     setDraft('');
   };
   return html`<div class="cm-pane" style=${`--cm-inset:${inset}px`}>
-    <div class=${cx('cm-head', !closable && 'no-close')}>
-      ${closable && html`<button class="cm-close" aria-label="Close comments" onClick=${onClose}><${Icon} name="close_outlined" size=${24} /></button>`}
+    <div class="cm-head">
+      <button class="cm-close" aria-label="Close comments" onClick=${onClose}><${Icon} name="close_outlined" size=${24} /></button>
       <div class="cm-title">${list.length} comments</div>
     </div>
     <div class="cm-list">

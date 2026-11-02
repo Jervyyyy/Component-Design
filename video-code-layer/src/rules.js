@@ -4,7 +4,6 @@ export const DUO = {
   B: { name: '内屏竖握（展平）', en: 'Inner Portrait', w: 669, h: 951 },
   C: { name: '内屏横握（展平）', en: 'Inner Landscape', w: 951, h: 669 },
   D: { name: '内屏半折（桌面态）', en: 'Partial Tabletop', w: 669, h: 951 },
-  E: { name: '内屏半折（书本态）', en: 'Partial Book', w: 951, h: 669 },
 };
 
 // Window rules from the TDS spec:
@@ -78,7 +77,6 @@ export function resolve(state, { kind, w, h, posture }) {
   if (posture === 'A' && hasSideRail) notes.push('Duo 外屏：SideRail 放在 Vertical Bar 内，不占内容区 382');
   if (posture === 'C-split') notes.push('Duo 内屏横握 · 打开评论：播放器 464 按 vertical，分栏边界对齐折痕 24，评论 380');
   if (posture === 'C-split' && hasSideRail) notes.push('SideRail 放在 Vertical Bar 内');
-  if (posture === 'E' && hasSideRail) notes.push('Duo 书本态：SideRail 放在 Vertical Bar 内，评论按钮打开右侧评论面板');
 
   const margin = kind === 'iphone' ? 16 : marginFor(w);
   notes.push(`控件左右边距 ${margin}（${w < 600 ? '< 600' : w < 834 ? '600–834' : '834–1184'} 档）`);

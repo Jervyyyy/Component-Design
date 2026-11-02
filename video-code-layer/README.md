@@ -18,9 +18,9 @@ Interactive reconstruction of the **Video 视频** component from the TDS Figma 
   the controls auto-hide after 3 s idle (`autoHide`, on by default; any control use or scrub restarts
   the timer); `paused` / `loading` / `error` / scrubbing keep them visible. Fade 250 ms with a 4 pt shift;
   the hidden state survives rotate / fold / resize. Loading and error grey out the ControlBar.
-- **Devices.** iPhone (portrait / landscape), **iPhone Duo** postures A–E from the
+- **Devices.** iPhone (portrait / landscape), **iPhone Duo** postures A–D from the
   "Video · iPhone Duo 适配" page (outer 466×678 with Vertical Bar, inner portrait with reserved area,
-  inner landscape, tabletop, book), and **Resizable** — drag the window edges; orientation,
+  inner landscape — full screen or comments split — and tabletop), and **Resizable** — drag the window edges; orientation,
   control-bar type, margins (16 / 32 / 40) and large/small-window rules follow the Foldable guideline.
 
 The video element is created once and re-parented between layouts, so rotating, folding or resizing
