@@ -275,14 +275,17 @@ input { font: inherit; }
 .duo .hinge-v, .duo .hinge-h { position: absolute; z-index: 1; background: linear-gradient(90deg, #2a2c30, #55595f, #2a2c30); }
 .duo .hinge-v { top: -4px; bottom: -4px; width: 26px; left: 50%; transform: translateX(-50%); border-radius: 4px; }
 .duo .hinge-h { left: -4px; right: -4px; height: 26px; top: 50%; transform: translateY(-50%); border-radius: 4px; background: linear-gradient(180deg, #2a2c30, #55595f, #2a2c30); }
-.vbar { position: absolute; top: 0; bottom: 0; right: 0; width: 84px; display: flex; flex-direction: column; align-items: center; }
+/* Pane controls：内容是距左 12 的 48pt 列（状态栏、SideRail 同列） */
+.vbar { position: absolute; top: 0; bottom: 0; right: 0; width: 84px; display: flex; flex-direction: column; align-items: center; padding: 0 24px 0 12px; }
 .vbar.dark { background: #000; color: #fff; }
 .vbar.light { background: #fff; color: #000; }
-.vbar .cam { margin-top: 24px; width: 22px; height: 22px; border-radius: 99px; background: radial-gradient(circle at 40% 40%, #2a3140, #07090c 70%); box-shadow: 0 0 0 2px #0d0f13; }
-.vbar .vb-time { font: 700 16px/19px ui-rounded, 'SF Pro Rounded', -apple-system, var(--font); }
+.vbar .cam { margin-top: 29px; width: 36px; height: 36px; border-radius: 99px; background: radial-gradient(circle at 40% 40%, #2a3140, #07090c 70%); box-shadow: 0 0 0 2px #0d0f13; }
+.vbar .vb-time { width: 48px; text-align: center; font: 700 16px/19px ui-rounded, 'SF Pro Rounded', -apple-system, var(--font); }
 .vbar .vb-levels { width: 46px; height: 46px; margin-top: 6px; }
-.reserved { position: absolute; top: 0; right: 0; width: 151px; height: 84px; display: flex; align-items: center; justify-content: center; gap: 10px; color: #fff; z-index: 25; }
-.reserved .vb-time { font: 600 17px/22px -apple-system, 'SF Pro Text', var(--font); }
+.reserved { position: absolute; top: 0; right: 0; width: 151px; height: 84px; color: #fff; z-index: 25; }
+.duo-sb-v { position: absolute; left: 23px; top: 24px; width: 104px; height: 48px; display: flex; align-items: center; gap: 3px; padding-left: 8px; }
+.duo-sb-v .vb-time { width: 46px; text-align: center; font: 700 16px/20px ui-rounded, 'SF Pro Rounded', -apple-system, var(--font); }
+.duo-sb-v .vb-levels { width: 46px; height: 46px; }
 
 .fold-region { position: absolute; z-index: 26; background: #000; pointer-events: none; }
 

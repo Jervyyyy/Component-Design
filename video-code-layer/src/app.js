@@ -1,5 +1,5 @@
 import { html, render, useState, useEffect, useRef, useLayoutEffect, cx, fmtTime } from './lib.js';
-import { Icon, RawSvg, DUO_LEVELS, STATUS_ICONS } from './icons.js';
+import { Icon, RawSvg, DUO_LEVELS } from './icons.js';
 import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
 import { Video, TopBar, ControlBar, CenterState, SideRail, seekShown } from './video.js';
@@ -48,10 +48,12 @@ function useSize(ref) {
   return s;
 }
 
+// Duo 状态栏（Figma › Pane controls › Status bar）：时间 SF Pro Rounded Bold 16 + Levels 46 圆形组合图标。
+// 横向（Vertical Bar 内）：外屏带灵动岛 36（y 29），时间 y 90；内屏无灵动岛，时间 y 40。
 function VerticalBar({ theme = 'dark', showCam = true, children }) {
   return html`<div class=${'vbar ' + theme}>
     ${showCam && html`<i class="cam"></i>`}
-    <div class="vb-time" style=${`margin-top:${showCam ? 22 : 40}px`}>9:41</div>
+    <div class="vb-time" style=${`margin-top:${showCam ? 25 : 40}px`}>9:41</div>
     <${RawSvg} svg=${DUO_LEVELS} cls="vb-levels" />
     ${children}
   </div>`;
@@ -95,7 +97,7 @@ function Duo({ st, set, live }) {
     screen = html`<div class="screen" style="width:466px;height:678px">
       <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 382, h: 678, railInVerticalBar: true }} live=${live} /></div>
       <${VerticalBar} theme="dark">
-        ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${18} bottom=${railBottom} />`}
+        ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${24} bottom=${railBottom} />`}
       <//>
     </div>`;
   } else if (k === 'B') {
@@ -103,7 +105,7 @@ function Duo({ st, set, live }) {
     r = resolve(st, { kind: 'duo', w: 669, h: 951, posture: k });
     screen = html`<div class="screen" style="width:669px;height:951px">
       <${Video} p=${r.p} env=${{ ...base, ...r.env, w: 669, h: 951, trailingInset: 151 - r.env.margin }} live=${live} />
-      <div class="reserved"><span class="vb-time">9:41</span><${RawSvg} svg=${STATUS_ICONS} style="width:87px;height:22px;clip-path:inset(0 31px 0 27px);margin:0 -31px 0 -27px" /></div>
+      <div class="reserved"><${DuoStatusBar} /></div>
     </div>`;
   } else if (k === 'C' && !cSplit(st)) {
     // 内屏横握 · 全屏（横版视频）：horizontal；内容区 867，16:9 宽度撑满 867×488；边距 40，ControlBar 完整版；展平时画面可跨折痕
@@ -152,7 +154,6 @@ function Duo({ st, set, live }) {
         ${p.hasControls && html`<${ControlBar} hidden=${hidden} disabled=${state === 'loading' || state === 'error'} type="standard" scrubbing=${live.scrubbing || p.cb.state === 'scrubbing'} hasSpeed=${p.cb.hasSpeed} hasRotate=${false}
             hasPreview=${p.cb.hasPreview} hasCounter=${false} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${m} onScrub=${live.onScrub} playlist=${playlist} />`}
       </div>
-      <div class="reserved"><span class="vb-time">9:41</span></div>
       <div class="fold-region" style=${`left:0;top:${upperH}px;width:669px;height:${foldH}px`}></div>
     </div>`;
   } else {
@@ -192,6 +193,11 @@ function Duo({ st, set, live }) {
 function stateOf(s, p) {
   if (p.centerOverride !== 'auto') return p.centerOverride;
   return s.error ? 'error' : s.loading ? 'loading' : s.playing ? 'playing' : 'paused';
+}
+
+// 纵向（内屏竖握，保留区 151×84 内）：104×48，时间与 Levels 横排
+function DuoStatusBar() {
+  return html`<div class="duo-sb-v"><span class="vb-time">9:41</span><${RawSvg} svg=${DUO_LEVELS} cls="vb-levels" /></div>`;
 }
 
 function CenterStateLive({ p }) {
