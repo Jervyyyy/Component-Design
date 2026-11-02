@@ -50,7 +50,12 @@ function useSize(ref) {
 
 // Duo 状态栏（Figma › Pane controls › Status bar）：时间 SF Pro Rounded Bold 16 + Levels 46 圆形组合图标。
 // 横向（Vertical Bar 内）：外屏带灵动岛 36（y 29），时间 y 90；内屏无灵动岛，时间 y 40。
-function VerticalBar({ theme = 'dark', showCam = true, children }) {
+// pill（Status bar hasBG）：状态栏浮在画面上时加半透明胶囊底 56×102
+function VerticalBar({ theme = 'dark', showCam = true, pill = false, children }) {
+  if (pill) return html`<div class=${'vbar ' + theme}>
+    <div class="vb-pill"><div class="vb-time">9:41</div><${RawSvg} svg=${DUO_LEVELS} cls="vb-levels" /></div>
+    ${children}
+  </div>`;
   return html`<div class=${'vbar ' + theme}>
     ${showCam && html`<i class="cam"></i>`}
     <div class="vb-time" style=${`margin-top:${showCam ? 25 : 40}px`}>9:41</div>
@@ -108,11 +113,12 @@ function Duo({ st, set, live }) {
       <div class="reserved"><${DuoStatusBar} /></div>
     </div>`;
   } else if (k === 'C' && !cSplit(st)) {
-    // 内屏横握 · 全屏（横版视频）：horizontal；内容区 867，16:9 宽度撑满 867×488；边距 40，ControlBar 完整版；展平时画面可跨折痕
-    r = resolve(st, { kind: 'duo', w: 867, h: 669, posture: k });
+    // 内屏横握 · 全屏（横版视频）：horizontal；画面不避让侧边栏，铺满 951，16:9 宽度撑满 951×535；边距 40，ControlBar 完整版；
+    // 展平时画面可跨折痕。状态栏（hasBG）浮在画面上，TopBar 尾部让开状态栏列
+    r = resolve(st, { kind: 'duo', w: 951, h: 669, posture: k });
     screen = html`<div class="screen" style="width:951px;height:669px">
-      <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 867, h: 669 }} live=${live} /></div>
-      <${VerticalBar} theme="dark" showCam=${false} />
+      <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 951, h: 669, trailingInset: 84 - r.env.margin }} live=${live} /></div>
+      <${VerticalBar} theme="clear" showCam=${false} pill=${true} />
     </div>`;
   } else if (k === 'C') {
     // 内屏横握 · 打开评论（竖版视频）：播放器 464（leading，按 vertical 模式，边距 16）+ 折痕 24 + 评论 380（trailing）

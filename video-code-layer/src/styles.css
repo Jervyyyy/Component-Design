@@ -279,6 +279,8 @@ input { font: inherit; }
 .vbar { position: absolute; top: 0; bottom: 0; right: 0; width: 84px; display: flex; flex-direction: column; align-items: center; padding: 0 24px 0 12px; }
 .vbar.dark { background: #000; color: #fff; }
 .vbar.light { background: #fff; color: #000; }
+.vbar.clear { background: transparent; color: #fff; pointer-events: none; z-index: 30; }
+.vbar .vb-pill { display: flex; flex-direction: column; align-items: center; width: 56px; margin-top: 21px; padding: 19px 0 12px; border-radius: 100px; background: rgba(0,0,0,.24); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .vbar .cam { margin-top: 29px; width: 36px; height: 36px; border-radius: 99px; background: radial-gradient(circle at 40% 40%, #2a3140, #07090c 70%); box-shadow: 0 0 0 2px #0d0f13; }
 .vbar .vb-time { width: 48px; text-align: center; font: 700 16px/19px ui-rounded, 'SF Pro Rounded', -apple-system, var(--font); }
 .vbar .vb-levels { width: 46px; height: 46px; margin-top: 6px; }
