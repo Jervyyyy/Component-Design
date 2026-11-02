@@ -88,7 +88,7 @@ function Duo({ st, set, live }) {
   const s = player.s;
   const clip = CLIPS.find((c) => c.id === s.clipId);
   const others = playlist.filter((c) => c.id !== clip.id);
-  const base = { statusBar: false, topInset: 24, playlist, group: st.group, onGroup: live.onGroup, onRotate: null };
+  const base = { statusBar: false, topInset: 24, playlist, group: st.group, onGroup: live.onGroup, onRotate: null, mediaFullHeight: true };
   let screen, r;
   const pad = 14;
 

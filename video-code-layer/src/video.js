@@ -33,9 +33,10 @@ function Toast({ top }) {
 // ---------------------------------------------------------------------------------------------
 // Media (.Video.MediaPortrait / .Video.MediaLandscape)
 // ---------------------------------------------------------------------------------------------
-export function mediaLayout(W, H, orientation, ratio, withHint) {
+export function mediaLayout(W, H, orientation, ratio, withHint, fullHeight) {
   const r = RATIO[ratio];
-  if (orientation === 'horizontal') {
+  // fullHeight（iPhone Duo）：竖屏 9:16 不给控制栏留 76pt，画面高度撑满、可延伸到进度条下方，按横屏同样方式居中
+  if (orientation === 'horizontal' || (fullHeight && ratio === '9:16')) {
     // 横屏：三档均为高度撑满、水平居中 (Aspect Fit when the window is narrower than the video)
     let h = H, w = H * r;
     if (w > W) { w = W; h = W / r; }
@@ -46,11 +47,13 @@ export function mediaLayout(W, H, orientation, ratio, withHint) {
     const h = H - 76, w = h * r;
     return { x: (W - w) / 2, y: 0, w, h };
   }
-  // 竖屏 3:4 宽度撑满、垂直居中；16:9 宽度撑满，与下方 16pt 的 Rotate 按钮一起垂直居中
+  // 竖屏 3:4 宽度撑满、垂直居中；16:9 宽度撑满，与下方 16pt 的 Rotate 按钮一起垂直居中。
+  // 画面底边不越过进度条：与 9:16 一致，底部 76pt 留给控制栏，放不下时按 W × (H − 76) 等比缩小
+  const maxBottom = H - 76;
   let w = W, h = W / r;
-  if (h > H) { h = H; w = H * r; }
+  if (h > maxBottom) { h = maxBottom; w = h * r; }
   const group = h + (withHint ? 16 + 30 : 0);
-  const y = (H - group) / 2;
+  const y = Math.max(0, Math.min((H - group) / 2, maxBottom - h));
   return { x: (W - w) / 2, y, w, h, hintY: y + h + 16 };
 }
 
@@ -307,7 +310,7 @@ export function Video({ p, env, live }) {
   const vertical = p.orientation === 'vertical';
   const scrubbing = live.scrubbing || p.cb.state === 'scrubbing';
   const showHint = vertical && p.ratio === '16:9' && env.rotateHint;
-  const rect = mediaLayout(W, H, p.orientation, p.ratio, showHint);
+  const rect = mediaLayout(W, H, p.orientation, p.ratio, showHint, env.mediaFullHeight);
   const mediaOnly = env.layout === 'mediaOnly';
 
   // Video.State: loading / error come from the instance override (CenterState) or the real player
