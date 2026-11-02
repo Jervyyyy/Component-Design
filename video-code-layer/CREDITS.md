@@ -10,6 +10,9 @@ Clips were shortened; the Garden Rhapsody upload had its soundtrack removed by t
 | `chinatown`, `chinatown-market` | [SINGAPORE - Chinatown at Night - 4K 60fps (UHD)](https://commons.wikimedia.org/wiki/File:SINGAPORE_-_Chinatown_at_Night_-_4K_60fps_(UHD).webm) | POPtravel | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) (YouTube CC-BY) |
 | `cloudforest` | [濱海灣花園展館瀑布](https://commons.wikimedia.org/wiki/File:%E6%BF%B1%E6%B5%B7%E7%81%A3%E8%8A%B1%E5%9C%92%E5%B1%95%E9%A4%A8%E7%80%91%E5%B8%83.webm) | LN9267 | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) (YouTube CC-BY) |
 | `jewel` | [Rain Vortex at Jewel Changi 2023 01](https://commons.wikimedia.org/wiki/File:Rain_Vortex_at_Jewel_Changi_2023_01.webm) | Mike Peel (www.mikepeel.net) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `v-botanic` (vertical) | [Singapore - Singapore Botanic Gardens - Rain Forest Trail - 2022-12-21](https://commons.wikimedia.org/wiki/File:Singapore_-_Singapore_Botanic_Gardens_-_Rain_Forest_Trail_-_2022-12-21.webm) | Sjenghai | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| `v-temple` (vertical) | [Music at Sri Mariamman Temple Singapore (2025)](https://commons.wikimedia.org/wiki/File:Music_at_Sri_Mariamman_Temple_Singapore_(2025).webm) | Chainwit. | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `v-goose` (vertical) | [Magpie Goose (Bird Paradise, Singapore)](https://commons.wikimedia.org/wiki/File:Magpie_Goose_(Bird_Paradise,_Singapore).webm) | Pscmaczilhca | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 
 Fonts: Inter (variable, latin + latin-ext) — SIL Open Font License 1.1, see `assets/fonts/Inter-LICENSE`.
 Runtime: Preact + htm standalone build (`vendor/preact-htm.mjs`) — MIT / Apache-2.0, see `vendor/htm-LICENSE`.

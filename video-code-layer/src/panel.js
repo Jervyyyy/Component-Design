@@ -1,7 +1,7 @@
 // Left control panel — every control maps 1:1 to a TDS component property (names as in Figma).
 import { html, cx, fmtTime } from './lib.js';
 import { player, speedLabel } from './player.js';
-import { CLIPS, clipsOf } from './media.js';
+import { clipsOf } from './media.js';
 import { CLASS_LABEL, DUO, cSplit } from './rules.js';
 
 export function Seg({ value, options, onChange, full, disabled }) {
@@ -138,8 +138,8 @@ export function Panel({ st, set, resolved, scrubbing, onPeekScrub, ps, controlsH
       <//>`)}
     <//>`}
 
-    <${Sec} name="Content" cn="素材 · Singapore" tag=${(clipsOf(st.group).findIndex((c) => c.id === ps.clipId) + 1 || '–') + '/' + clipsOf(st.group).length}>
-      <div class="clips">${CLIPS.map((c) => html`<button class=${cx('clip', ps.clipId === c.id && 'on')} onClick=${() => { if (!clipsOf(st.group).find((x) => x.id === c.id)) set({ group: 'highlights' }); player.load(c.id); }}>
+    <${Sec} name="Content" cn="素材 · Singapore" tag=${(clipsOf(st.group, st.ratio).findIndex((c) => c.id === ps.clipId) + 1 || '–') + '/' + clipsOf(st.group, st.ratio).length}>
+      <div class="clips">${clipsOf('highlights', st.ratio).map((c) => html`<button class=${cx('clip', ps.clipId === c.id && 'on')} onClick=${() => { if (!clipsOf(st.group, st.ratio).find((x) => x.id === c.id)) set({ group: 'highlights' }); player.load(c.id); }}>
         <img src=${c.poster} alt="" /><div><b>${c.title}</b><span>${c.place} · ${fmtTime(c.duration)}</span></div>
       </button>`)}</div>
       <div class="note">实拍素材来自 Wikimedia Commons（CC 授权，见 CREDITS.md）。</div>

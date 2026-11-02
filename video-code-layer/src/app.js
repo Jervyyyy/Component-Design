@@ -1,7 +1,7 @@
 import { html, render, useState, useEffect, useRef, useLayoutEffect, cx, fmtTime } from './lib.js';
 import { RawSvg, DUO_LEVELS } from './icons.js';
 import { player, usePlayer } from './player.js';
-import { CLIPS, clipsOf } from './media.js';
+import { CLIPS, clipsOf, orientOf } from './media.js';
 import { Video, TopBar, ControlBar, CenterState, SideRail, seekShown } from './video.js';
 import { resolve, cSplit, CLASS_LABEL, DUO } from './rules.js';
 import { CommentsPane } from './comments.js';
@@ -72,7 +72,7 @@ function IPhone({ st, set, live }) {
   const r = resolve(st, { kind: 'iphone', w, h });
   const env = {
     w, h, statusBar: vertical, topInset: 8, margin: 16, rotateHint: true,
-    onRotate: (o) => set({ iphoneOrient: o }), playlist: clipsOf(st.group), group: st.group, onGroup: live.onGroup,
+    onRotate: (o) => set({ iphoneOrient: o }), playlist: clipsOf(st.group, st.ratio), group: st.group, onGroup: live.onGroup,
   };
   return { r, natural: { w: w + 24, h: h + 24 }, node: html`<div class=${cx('iphone', !vertical && 'landscape')}>
     <div class="screen" style=${`width:${w}px;height:${h}px`}>
@@ -84,7 +84,7 @@ function IPhone({ st, set, live }) {
 
 function Duo({ st, set, live }) {
   const k = st.duo, spec = DUO[k];
-  const playlist = clipsOf(st.group);
+  const playlist = clipsOf(st.group, st.ratio);
   const s = player.s;
   const clip = CLIPS.find((c) => c.id === s.clipId);
   const others = playlist.filter((c) => c.id !== clip.id);
@@ -190,7 +190,7 @@ function Resizable({ st, set, live, scale }) {
   const r = resolve(st, { kind: 'resizable', w, h });
   const env = {
     ...r.env, w, h, statusBar: false, topInset: r.p.orientation === 'vertical' ? 24 : 8,
-    onRotate: () => set({ rz: { w: h, h: w } }), playlist: clipsOf(st.group), group: st.group, onGroup: live.onGroup,
+    onRotate: () => set({ rz: { w: h, h: w } }), playlist: clipsOf(st.group, st.ratio), group: st.group, onGroup: live.onGroup,
   };
   const drag = (axis) => (e) => {
     e.preventDefault();
@@ -229,7 +229,15 @@ function App() {
   const stage = useSize(stageRef);
   const scaleRef = useRef(1);
 
-  useEffect(() => { player.load(CLIPS[0].id, { keepPlaying: false }); }, []);
+  useEffect(() => { player.load(clipsOf(st.group, st.ratio)[0].id, { keepPlaying: false }); }, []);
+  // 切 ratio 跨横 / 竖时换成同方向的素材，横版素材不进竖版画面，反之亦然
+  useEffect(() => {
+    const cur = CLIPS.find((c) => c.id === player.s.clipId);
+    if (cur && cur.orient !== orientOf(st.ratio)) {
+      const list = clipsOf(st.group, st.ratio);
+      player.load((list[0] || clipsOf('highlights', st.ratio)[0]).id);
+    }
+  }, [st.ratio]);
   // Video.State = error 对应视频未加载：画面清空、进度归零；离开 error 时重新加载当前视频
   const prevOverride = useRef(st.centerOverride);
   useEffect(() => {
@@ -251,7 +259,7 @@ function App() {
     setControlsHidden,
     onGroup: (g) => {
       set({ group: g });
-      const list = clipsOf(g);
+      const list = clipsOf(g, st.ratio);
       if (!list.find((c) => c.id === player.s.clipId)) player.load(list[0].id);
     },
   };

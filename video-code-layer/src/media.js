@@ -1,6 +1,7 @@
 // Sample content: real Singapore travel footage (Wikimedia Commons, see CREDITS.md), matching the
 // destination used in the TDS iPhone Duo case (Marina Bay · Gardens by the Bay · Chinatown · Jewel).
 // `chapters` feeds Video.ProgressBar hasChapters (fractions of the duration).
+// `orient`: h = 横版素材（16:9）, v = 竖版素材（9:16）。Media › ratio 只在同方向的素材里取，横竖不混用。
 const M = './assets/media/';
 
 export const CLIPS = [
@@ -11,7 +12,13 @@ export const CLIPS = [
   { id: 'jewel', title: 'Jewel Changi Airport · Rain Vortex', place: 'Singapore', views: '21k views', duration: 5.86, chapters: [0.5], group: 'official' },
   { id: 'supertree', title: 'Supertree Grove Light Show', place: 'Singapore', views: '4.4k views', duration: 29.97, chapters: [0.33, 0.66], group: 'guest' },
   { id: 'chinatown-market', title: 'Chinatown Street Market', place: 'Singapore', views: '2.7k views', duration: 26.0, chapters: [0.4, 0.75], group: 'guest' },
-].map((c) => ({ ...c, src: M + c.id + '.mp4', poster: M + c.id + '.jpg' }));
+  // 竖版
+  { id: 'v-botanic', orient: 'v', title: 'Botanic Gardens · Rain Forest Trail', place: 'Singapore', views: '6.3k views', duration: 30.0, chapters: [0.3, 0.65], group: 'official' },
+  { id: 'v-temple', orient: 'v', title: 'Sri Mariamman Temple · Chinatown', place: 'Singapore', views: '3.2k views', duration: 22.66, chapters: [0.5], group: 'guest' },
+  { id: 'v-goose', orient: 'v', title: 'Bird Paradise · Magpie Goose', place: 'Singapore', views: '1.8k views', duration: 5.81, chapters: [0.5], group: 'official' },
+].map((c) => ({ orient: 'h', ...c, src: M + c.id + '.mp4', poster: M + c.id + '.jpg' }));
+
+export const orientOf = (ratio) => (ratio === '16:9' ? 'h' : 'v');
 
 // Video.TopBar centerSlot → SegmentedControl (分组切换)
 export const GROUPS = [
@@ -20,4 +27,4 @@ export const GROUPS = [
   { id: 'guest', label: 'Guest' },
 ];
 
-export const clipsOf = (group) => (group === 'highlights' ? CLIPS : CLIPS.filter((c) => c.group === group));
+export const clipsOf = (group, ratio = '16:9') => CLIPS.filter((c) => c.orient === orientOf(ratio) && (group === 'highlights' || c.group === group));
