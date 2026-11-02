@@ -61,7 +61,7 @@ export function DeviceBar({ st, set, resolved, scale }) {
   </div>`;
 }
 
-export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
+export function Panel({ st, set, resolved, scrubbing, onPeekScrub, ps, controlsHidden }) {
   const na = resolved.na;
   const cb = (patch) => set((o) => ({ cb: { ...o.cb, ...patch } }));
   const rail = (patch) => set((o) => ({ rail: { ...o.rail, ...patch } }));
@@ -114,7 +114,7 @@ export function Panel({ st, set, resolved, scrubbing, ps, controlsHidden }) {
       <//>
       <${Row} label="hasSpeed" na=${na['cb.hasSpeed']} tip="1.0X › 1.25X › 1.5X › 2.0X › 0.75X"><${Switch} on=${st.cb.hasSpeed} onChange=${(v) => cb({ hasSpeed: v })} /><//>
       <${Row} label="hasRotate" na=${na['cb.hasRotate']} tip="standard 右端 Shrink 图标"><${Switch} on=${st.cb.hasRotate} onChange=${(v) => cb({ hasRotate: v })} /><//>
-      <${Row} label="hasPreview" tip="scrubbing 时的画面缩略预览"><${Switch} on=${st.cb.hasPreview} onChange=${(v) => cb({ hasPreview: v })} /><//>
+      <${Row} label="hasPreview" sub="拖动时显示" tip="scrubbing 时的画面缩略预览；打开时预览 2 秒"><${Switch} on=${st.cb.hasPreview} onChange=${(v) => { cb({ hasPreview: v }); if (v) onPeekScrub(); }} /><//>
       <${Row} label="hasCounter" na=${na['cb.hasCounter']} tip="多素材计数：胶片条 + 数量标记"><${Switch} on=${st.cb.hasCounter} onChange=${(v) => cb({ hasCounter: v })} /><//>
     <//>
 

@@ -225,6 +225,10 @@ function App() {
   const [st, setSt] = useState(DEFAULTS);
   const [scrubbing, setScrubbing] = useState(false);
   const [controlsHidden, setControlsHidden] = useState(false); // 运行时清屏状态，跨旋转/折叠/缩放保留
+  // 打开只在拖动时出现的能力（hasPreview）时，短暂进入 scrubbing 让效果立刻可见
+  const [peek, setPeek] = useState(false);
+  const peekTimer = useRef(null);
+  const peekScrub = () => { setPeek(true); clearTimeout(peekTimer.current); peekTimer.current = setTimeout(() => setPeek(false), 2000); };
   const ps = usePlayer();
   const set = (patch) => setSt((o) => ({ ...o, ...(typeof patch === 'function' ? patch(o) : patch) }));
   const stageRef = useRef(null);
@@ -247,7 +251,7 @@ function App() {
   }, []);
 
   const live = {
-    scrubbing,
+    scrubbing: scrubbing || peek,
     onScrub: setScrubbing,
     controlsHidden,
     setControlsHidden,
@@ -267,7 +271,7 @@ function App() {
 
 
   return html`<div class="app">
-    <${Panel} st=${st} set=${set} resolved=${dev.r} scrubbing=${scrubbing} ps=${ps} controlsHidden=${controlsHidden} />
+    <${Panel} st=${st} set=${set} resolved=${dev.r} scrubbing=${scrubbing || peek} onPeekScrub=${peekScrub} ps=${ps} controlsHidden=${controlsHidden} />
     <main class="stage">
       <${DeviceBar} st=${st} set=${set} resolved=${dev.r} scale=${scale} />
       <div class="stage-canvas" ref=${stageRef}>
