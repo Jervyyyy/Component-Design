@@ -19,6 +19,9 @@ export function windowClass(w, h) {
 // 控件左右边距：< 600 → 16，600–834 → 32，834–1184 → 40
 export const marginFor = (w) => (w < 600 ? 16 : w < 834 ? 32 : 40);
 
+// 内屏横握：横版视频（16:9）默认全屏，竖版视频（9:16 / 3:4）默认分栏打开评论；cComments 可手动覆盖
+export const cSplit = (st) => st.cComments ?? st.ratio !== '16:9';
+
 export const CLASS_LABEL = { phone: '手机规则', large: '大屏规则 · 展开态', small: '小窗口' };
 
 /**
@@ -72,6 +75,8 @@ export function resolve(state, { kind, w, h, posture }) {
   if (vertical && state.ratio === '16:9' && !rotateHint) notes.push('「Rotate for fullscreen」不出现（大屏 / Duo 外屏横握已禁用）');
 
   if (posture === 'A' && hasSideRail) notes.push('Duo 外屏：SideRail 放在 Vertical Bar 内，不占内容区 382');
+  if (posture === 'C-split') notes.push('Duo 内屏横握 · 打开评论：播放器 464 按 vertical，分栏边界对齐折痕 24，评论 380');
+  if (posture === 'C-split' && hasSideRail) notes.push('SideRail 放在 Vertical Bar 内');
   if (posture === 'E' && hasSideRail) notes.push('Duo 书本态：SideRail 放在 Vertical Bar 内，评论按钮打开右侧评论面板');
 
   const margin = kind === 'iphone' ? 16 : marginFor(w);

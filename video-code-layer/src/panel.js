@@ -2,7 +2,7 @@
 import { html, cx, fmtTime } from './lib.js';
 import { player, speedLabel } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
-import { CLASS_LABEL, DUO } from './rules.js';
+import { CLASS_LABEL, DUO, cSplit } from './rules.js';
 
 export function Seg({ value, options, onChange, full, disabled }) {
   return html`<div class=${cx('segc', full && 'full')}>
@@ -51,6 +51,7 @@ export function DeviceBar({ st, set, resolved, scale }) {
     </div>
     ${st.device === 'duo' && html`<div class="devbar-row sub">
       <span class="devbar-meta">${DUO[st.duo].en} · ${DUO[st.duo].w} × ${DUO[st.duo].h} pt</span>
+      ${st.duo === 'C' && html`<span class="devbar-item">布局 <${Seg} value=${cSplit(st) ? 'split' : 'full'} onChange=${(v) => set({ cComments: v === 'split' })} options=${[['full', '全屏 · 横版视频'], ['split', '打开评论 · 竖版视频']]} /></span>`}
       ${st.duo === 'D' && html`<span class="devbar-item">下半屏 <${Seg} value=${st.duoD} onChange=${(v) => set({ duoD: v })} options=${[['info', '信息与选集'], ['center', '中心状态']]} /></span>`}
     </div>`}
     ${st.device === 'resizable' && html`<div class="devbar-row sub">
@@ -91,7 +92,7 @@ export function Panel({ st, set, resolved, scrubbing, onPeekScrub, ps, controlsH
 
     <${Sec} name="Media" cn="画面区" tag=${vertical ? '.Video.MediaPortrait' : '.Video.MediaLandscape'}>
       <${Row} label="ratio" tip=${vertical ? (st.ratio === '9:16' ? '顶部对齐，底部留 76pt' : st.ratio === '3:4' ? '宽度撑满，垂直居中' : '垂直居中，下方 16pt 自带 Rotate 按钮') : '高度撑满，水平居中'}>
-        <${Seg} value=${st.ratio} onChange=${(v) => set({ ratio: v })} options=${['9:16', '3:4', '16:9']} />
+        <${Seg} value=${st.ratio} onChange=${(v) => set({ ratio: v, cComments: null })} options=${['9:16', '3:4', '16:9']} />
       <//>
     <//>
 

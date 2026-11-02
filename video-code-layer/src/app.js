@@ -3,7 +3,7 @@ import { Icon, RawSvg, DUO_LEVELS, STATUS_ICONS } from './icons.js';
 import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
 import { Video, TopBar, ControlBar, CenterState, SideRail, seekShown } from './video.js';
-import { resolve, CLASS_LABEL, DUO } from './rules.js';
+import { resolve, cSplit, CLASS_LABEL, DUO } from './rules.js';
 import { CommentsPane, commentCount } from './comments.js';
 import { Panel, DeviceBar } from './panel.js';
 
@@ -13,6 +13,7 @@ export const DEFAULTS = {
   duo: 'A',                  // iPhone Duo posture A–E
   duoD: 'info',              // tabletop lower half: info | center
   bookComments: true,        // book posture secondary pane: comments | details
+  cComments: null,           // inner landscape: null = follow ratio | true = comments split | false = full screen
   rz: { w: 669, h: 951 },
   // ---- TDS props (Video 主组件) ----
   hasTopBar: true,
@@ -104,12 +105,27 @@ function Duo({ st, set, live }) {
       <${Video} p=${r.p} env=${{ ...base, ...r.env, w: 669, h: 951, trailingInset: 151 - r.env.margin }} live=${live} />
       <div class="reserved"><span class="vb-time">9:41</span><${RawSvg} svg=${STATUS_ICONS} style="width:87px;height:22px;clip-path:inset(0 31px 0 27px);margin:0 -31px 0 -27px" /></div>
     </div>`;
-  } else if (k === 'C') {
-    // 内屏横握：horizontal；内容区 867，不进入 Vertical Bar；展平时画面可跨折痕
+  } else if (k === 'C' && !cSplit(st)) {
+    // 内屏横握 · 全屏（横版视频）：horizontal；内容区 867，16:9 宽度撑满 867×488；边距 40，ControlBar 完整版；展平时画面可跨折痕
     r = resolve(st, { kind: 'duo', w: 867, h: 669, posture: k });
     screen = html`<div class="screen" style="width:951px;height:669px">
       <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 867, h: 669 }} live=${live} /></div>
       <${VerticalBar} theme="dark" showCam=${false} />
+    </div>`;
+  } else if (k === 'C') {
+    // 内屏横握 · 打开评论（竖版视频）：播放器 464（leading，按 vertical 模式，边距 16）+ 折痕 24 + 评论 380（trailing）
+    // + Vertical Bar 84；分栏边界对齐折痕，画面不跨折痕
+    r = resolve(st, { kind: 'duo', w: 464, h: 669, posture: 'C-split' });
+    const p = r.p;
+    screen = html`<div class="screen" style="width:951px;height:669px;background:#000">
+      <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 464, h: 669, railInVerticalBar: true }} live=${live} /></div>
+      <div class="fold-region" style="left:464px;top:0;width:24px;height:669px"></div>
+      <div class="pane-dark" style="left:488px;top:0;width:380px;height:669px">
+        <${CommentsPane} inset=${0} onClose=${() => set({ cComments: false })} />
+      </div>
+      <${VerticalBar} theme="dark" showCam=${false}>
+        ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${24} bottom=${24} onComment=${() => set({ cComments: false })} />`}
+      <//>
     </div>`;
   } else if (k === 'D') {
     // 内屏半折（桌面态）：画面在上半屏 669×463.5（horizontal），ControlBar 与信息在下半屏，不跨折痕区

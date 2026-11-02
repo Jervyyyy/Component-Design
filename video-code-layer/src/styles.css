@@ -326,10 +326,10 @@ input { font: inherit; }
 .list-item.dark .li-text span, .list-item.dark .ic:last-child { color: rgba(255,255,255,.6); }
 
 .cm-pane { position: absolute; inset: 0; display: flex; flex-direction: column; color: #fff; }
-.cm-head { flex: none; display: flex; align-items: flex-start; gap: 12px; height: 36px; margin: 24px 0 0 12px; width: 380px; padding-left: 12px; border-bottom: 1px solid rgba(255,255,255,.24); }
+.cm-head { flex: none; display: flex; align-items: flex-start; gap: 12px; height: 36px; margin: 24px 0 0 var(--cm-inset, 12px); width: 380px; padding-left: 12px; border-bottom: 1px solid rgba(255,255,255,.24); }
 .cm-close { width: 24px; height: 24px; color: #fff; }
 .cm-title { margin-top: 2px; font-size: 16px; line-height: 20px; font-weight: 700; }
-.cm-list { flex: 1; min-height: 0; overflow-y: auto; margin-left: 12px; width: 380px; scrollbar-width: none; overscroll-behavior: contain; }
+.cm-list { flex: 1; min-height: 0; overflow-y: auto; margin-left: var(--cm-inset, 12px); width: 380px; scrollbar-width: none; overscroll-behavior: contain; }
 .cm-list::-webkit-scrollbar { display: none; }
 .cm-item { display: flex; gap: 4px; padding: 12px 12px 0; }
 .cm-avatar { flex: none; width: 36px; height: 36px; border-radius: 999px; object-fit: cover; }
@@ -349,7 +349,7 @@ input { font: inherit; }
 .cm-like.on { color: var(--text-brand, #2c61fe); }
 .cm-divider { display: block; height: 0; margin-top: 12px; border-top: 1px solid rgba(255,255,255,.24); }
 .cm-end { height: 66px; padding-top: 24px; text-align: center; font-size: 12px; line-height: 18px; color: var(--text-tertiary); }
-.cm-input { flex: none; height: 90px; margin-left: 12px; width: 380px; padding: 12px; }
+.cm-input { flex: none; height: 90px; margin-left: var(--cm-inset, 12px); width: 380px; padding: 12px; }
 .cm-input input { width: 100%; height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid #b9bec7; background: transparent; color: #fff; font: 400 16px/24px var(--font); outline: none; }
 .cm-input input::placeholder { color: var(--text-tertiary); }
 .cm-input input:focus { border-color: #fff; }
