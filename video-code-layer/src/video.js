@@ -264,7 +264,7 @@ export function ControlBar({ hidden, disabled, type, scrubbing, hasSpeed, hasRot
 // ---------------------------------------------------------------------------------------------
 // Video.SideRail — 创作者 · 点赞 · 评论 · 收藏 · 分享 · 目录
 // ---------------------------------------------------------------------------------------------
-export function SideRail({ rail, right = 12, bottom = 94, hidden = false }) {
+export function SideRail({ rail, right = 12, bottom = 94, hidden = false, onComment }) {
   const [liked, setLiked] = useState(false);
   const [faved, setFaved] = useState(false);
   const [followed, setFollowed] = useState(false);
@@ -281,7 +281,7 @@ export function SideRail({ rail, right = 12, bottom = 94, hidden = false }) {
         ${!followed && html`<span class="vr-follow"><${Icon} name="add_circle_filled" size=${20} /></span>`}
       </button>`}
       ${rail.hasLike && item('like', 'thumbs_up_filled', bump(rail.likeCount, liked), rail.hasLikeCount, liked, () => setLiked(!liked))}
-      ${rail.hasComment && item('comment', 'comment_filled', rail.commentCount, rail.hasCommentCount, false)}
+      ${rail.hasComment && item('comment', 'comment_filled', rail.commentCount, rail.hasCommentCount, false, onComment)}
       ${rail.hasFavorite && item('fav', 'favorite_filled', bump(rail.favoriteCount, faved), rail.hasFavoriteCount, faved, () => setFaved(!faved))}
       ${rail.hasShare && item('share', 'arrow_share_ios_filled', '', false, false)}
     </div>

@@ -13,3 +13,7 @@ Clips were shortened; the Garden Rhapsody upload had its soundtrack removed by t
 
 Fonts: Inter (variable, latin + latin-ext) — SIL Open Font License 1.1, see `assets/fonts/Inter-LICENSE`.
 Runtime: Preact + htm standalone build (`vendor/preact-htm.mjs`) — MIT / Apache-2.0, see `vendor/htm-LICENSE`.
+
+## Comment avatars
+
+`assets/avatars/*.jpg` are exported from the TDS Video Figma file (`Video` › `Screen · book` › `Comment.Item` instances) for the iPhone Duo book-posture comments pane.

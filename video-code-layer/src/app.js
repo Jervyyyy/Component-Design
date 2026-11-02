@@ -4,6 +4,7 @@ import { player, usePlayer } from './player.js';
 import { CLIPS, clipsOf } from './media.js';
 import { Video, TopBar, ControlBar, CenterState, SideRail, seekShown } from './video.js';
 import { resolve, CLASS_LABEL, DUO } from './rules.js';
+import { CommentsPane, commentCount } from './comments.js';
 import { Panel, DeviceBar } from './panel.js';
 
 export const DEFAULTS = {
@@ -11,6 +12,7 @@ export const DEFAULTS = {
   iphoneOrient: 'vertical',  // iPhone rotation drives Video.orientation
   duo: 'A',                  // iPhone Duo posture A–E
   duoD: 'info',              // tabletop lower half: info | center
+  bookComments: true,        // book posture secondary pane: comments | details
   rz: { w: 669, h: 951 },
   // ---- TDS props (Video 主组件) ----
   hasTopBar: true,
@@ -139,22 +141,30 @@ function Duo({ st, set, live }) {
       <div class="fold-region" style=${`left:0;top:${upperH}px;width:669px;height:${foldH}px`}></div>
     </div>`;
   } else {
-    // 内屏半折（书本态）：播放器停靠 leading 半区（464），按半区当窗口 → vertical；trailing 放详情与选集
-    r = resolve(st, { kind: 'duo', w: 464, h: 669, posture: k });
-    screen = html`<div class="screen" style="width:951px;height:669px;background:#fff">
-      <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 464, h: 669 }} live=${live} /></div>
-      <div class="pane-light" style="left:488px;top:0;width:380px;height:669px;padding:24px 16px">
-        <div class="t-heading-s">${clip.title}</div>
-        <div class="t-body-m" style="color:var(--text-tertiary);margin-top:8px">${clip.place} · ${fmtTime(s.duration)} · ${clip.views}</div>
-        <div class="t-body-m" style="color:var(--text-tertiary);margin-top:24px">Up next</div>
-        <div style="margin-top:8px">${others.slice(0, 5).map((c) => html`<button class="list-item" onClick=${() => player.load(c.id)}>
-          <${Icon} name="layers_outlined" size=${24} style="color:var(--text-primary)" />
-          <div class="li-text"><b class="t-body-l">${c.title.split(' · ')[0]}</b><span class="t-body-m">${c.place} · ${fmtTime(c.duration)}</span></div>
-          <${Icon} name="arrow_right_ios_outlined" size=${16} style="color:var(--text-tertiary)" />
-        </button>`)}</div>
+    // 内屏半折（书本态）· NavigationSplitView：Primary 476 放播放器（按半区当窗口 → vertical），
+    // 铰链处 0pt 分隔线；Secondary 放评论，右侧 Vertical Bar 84 承载状态栏与 SideRail
+    r = resolve(st, { kind: 'duo', w: 476, h: 669, posture: k });
+    const p = r.p;
+    const comments = st.bookComments;
+    screen = html`<div class="screen" style="width:951px;height:669px;background:#000">
+      <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 476, h: 669, railInVerticalBar: true }} live=${live} /></div>
+      <i class="book-hinge"></i>
+      <div class="pane-dark book-secondary">
+        ${comments ? html`<${CommentsPane} onClose=${() => set({ bookComments: false })} />` : html`<div class="book-details">
+          <div class="t-heading-s">${clip.title}</div>
+          <div class="t-body-m meta">${clip.place} · ${fmtTime(s.duration)} · ${clip.views}</div>
+          <button class="book-open-comments t-body-m" onClick=${() => set({ bookComments: true })}><${Icon} name="comment_outlined" size=${16} />${commentCount()} comments<${Icon} name="arrow_right_ios_outlined" size=${16} /></button>
+          <div class="t-body-m upnext-h" style="margin-top:24px">Up next</div>
+          <div style="margin-top:8px">${others.slice(0, 4).map((c) => html`<button class="list-item dark" onClick=${() => player.load(c.id)}>
+            <${Icon} name="layers_outlined" size=${24} />
+            <div class="li-text"><b class="t-body-l">${c.title.split(' · ')[0]}</b><span class="t-body-m">${c.place} · ${fmtTime(c.duration)}</span></div>
+            <${Icon} name="arrow_right_ios_outlined" size=${16} />
+          </button>`)}</div>
+        </div>`}
       </div>
-      <div style="position:absolute;right:0;top:0;bottom:0;width:84px"><${VerticalBar} theme="light" showCam=${false} /></div>
-      <div class="fold-region" style=${`left:464px;top:0;width:24px;height:669px`}></div>
+      <${VerticalBar} theme="dark" showCam=${false}>
+        ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${24} bottom=${24} onComment=${() => set((o) => ({ bookComments: !o.bookComments }))} />`}
+      <//>
     </div>`;
   }
   return { r, natural: { w: spec.w + pad * 2, h: spec.h + pad * 2 }, node: html`<div style="position:relative">
