@@ -115,18 +115,24 @@ function Duo({ st, set, live }) {
     r = resolve(st, { kind: 'duo', w: 669, h: upperH, posture: k });
     const p = r.p, m = 32;
     const info = st.duoD === 'info';
+    // 下半屏控件与上半屏共用清屏状态：playing 3s 后一起隐藏，点上半屏画面或下半屏空白处先唤起
+    const state = stateOf(s, p);
+    const hidden = live.controlsHidden && state === 'playing' && !live.scrubbing && p.cb.state !== 'scrubbing';
+    const fade = (dir) => cx('v-fade', dir, hidden && 'is-hidden');
+    const activity = () => { if (!hidden) window.dispatchEvent(new Event('tds-activity')); };
+    const reveal = (e) => { if (hidden) { e.stopPropagation(); live.setControlsHidden(false); } };
     screen = html`<div class="screen" style="width:669px;height:951px">
       <div style="position:absolute;left:0;top:0">
         <${Video} p=${p} env=${{ ...base, ...r.env, w: 669, h: upperH, layout: 'mediaOnly', hideCenter: !info }} live=${live} />
       </div>
-      <div class="pane-dark tds-video" style=${`left:0;top:${lowerTop}px;width:669px;height:${lowerH}px;background:#000`}>
-        ${p.hasTopBar && html`<div style="padding-top:16px"><${TopBar} margin=${m} centerSlot=${p.topBar.centerSlot} group=${st.group} onGroup=${live.onGroup} /></div>`}
+      <div class="pane-dark tds-video" style=${`left:0;top:${lowerTop}px;width:669px;height:${lowerH}px;background:#000`} onPointerDownCapture=${activity} onClickCapture=${reveal}>
+        ${p.hasTopBar && html`<div class=${fade('up')} style="padding-top:16px"><${TopBar} margin=${m} centerSlot=${p.topBar.centerSlot} group=${st.group} onGroup=${live.onGroup} /></div>`}
         ${info ? html`<div style=${`padding:16px ${m}px 0`}>
           <div class="info"><div class="t-heading-s">${clip.title}</div><div class="t-body-m meta">${clip.place} · ${fmtTime(s.duration)} · ${clip.views}</div></div>
           <div class="t-body-m upnext-h" style="margin-top:16px">Up next</div>
           <div class="cards3">${others.slice(0, 3).map((c) => html`<button class="card3" onClick=${() => player.load(c.id)}><img src=${c.poster} alt="" /><span class="t-body-m">${c.title.split(' · ')[0]}</span></button>`)}</div>
-        </div>` : html`<${CenterStateLive} p=${p} />`}
-        ${p.hasControls && html`<${ControlBar} type="standard" scrubbing=${live.scrubbing || p.cb.state === 'scrubbing'} hasSpeed=${p.cb.hasSpeed} hasRotate=${false}
+        </div>` : html`<div class=${fade()}><${CenterStateLive} p=${p} /></div>`}
+        ${p.hasControls && html`<${ControlBar} hidden=${hidden} disabled=${state === 'loading' || state === 'error'} type="standard" scrubbing=${live.scrubbing || p.cb.state === 'scrubbing'} hasSpeed=${p.cb.hasSpeed} hasRotate=${false}
             hasPreview=${p.cb.hasPreview} hasCounter=${false} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${m} onScrub=${live.onScrub} playlist=${playlist} />`}
       </div>
       <div class="reserved"><span class="vb-time">9:41</span></div>
@@ -158,12 +164,13 @@ function Duo({ st, set, live }) {
   </div>` };
 }
 
+function stateOf(s, p) {
+  if (p.centerOverride !== 'auto') return p.centerOverride;
+  return s.error ? 'error' : s.loading ? 'loading' : s.playing ? 'playing' : 'paused';
+}
+
 function CenterStateLive({ p }) {
-  const s = usePlayer();
-  let d = s.playing ? 'playing' : 'paused';
-  if (s.loading) d = 'loading';
-  if (s.error) d = 'error';
-  if (p.centerOverride !== 'auto') d = p.centerOverride;
+  const d = stateOf(usePlayer(), p);
   return html`<div style="position:absolute;inset:0" onClick=${() => (d === 'playing' || d === 'paused') && player.toggle()}><${CenterState} display=${d} seek=${seekShown(p)} /></div>`;
 }
 

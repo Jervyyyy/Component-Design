@@ -315,6 +315,7 @@ export function Video({ p, env, live }) {
   if (s.loading) display = 'loading';
   if (s.error) display = 'error';
   if (p.centerOverride !== 'auto') display = p.centerOverride;
+  const state = display; // 真实播放状态：清屏计时与单击画面都看它，不受 hideCenter 影响
   if (env.hideCenter) display = 'hidden';
 
   const cbType = p.cb.type;
@@ -326,12 +327,12 @@ export function Video({ p, env, live }) {
   //  · playing 默认 3s 无操作自动隐藏；任何控件操作、拖动进度后重新计时
   //  · paused / loading / error / scrubbing 时控件常显
   //  · 显隐状态由外层持有，旋转、折叠、改变窗口尺寸时保持不变
-  const forceShow = display !== 'playing' || scrubbing;
-  const hidden = !mediaOnly && live.controlsHidden && !forceShow;
+  const forceShow = state !== 'playing' || scrubbing;
+  const hidden = live.controlsHidden && !forceShow;
   const timer = useRef(null);
   const arm = () => {
     clearTimeout(timer.current);
-    if (p.autoHide && !forceShow && !mediaOnly) timer.current = setTimeout(() => live.setControlsHidden(true), AUTO_HIDE_MS);
+    if (p.autoHide && !forceShow) timer.current = setTimeout(() => live.setControlsHidden(true), AUTO_HIDE_MS);
   };
   useEffect(() => {
     if (forceShow && live.controlsHidden) live.setControlsHidden(false);
@@ -342,8 +343,14 @@ export function Video({ p, env, live }) {
   const onPointerDown = () => { if (!hidden) arm(); };
   const tap = () => {
     if (hidden) { live.setControlsHidden(false); return; }
-    if (display === 'playing' || display === 'paused') player.toggle();
+    if (state === 'playing' || state === 'paused') player.toggle();
   };
+  // 控件不在本组件内时（Duo 桌面态下半屏），外部操作通过 tds-activity 重新计时
+  useEffect(() => {
+    const f = () => { if (!hidden) arm(); };
+    window.addEventListener('tds-activity', f);
+    return () => window.removeEventListener('tds-activity', f);
+  });
   const scrimTop = vertical ? 140 : 96, scrimBottom = vertical ? 220 : 160;
 
   return html`<div class=${cx('tds-video', vertical ? 'is-vertical' : 'is-horizontal')} style=${`width:${W}px;height:${H}px`} onPointerDownCapture=${onPointerDown} onClick=${tap} data-controls=${hidden ? 'hidden' : 'shown'}>
