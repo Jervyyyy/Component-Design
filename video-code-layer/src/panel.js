@@ -36,7 +36,7 @@ function Sec({ name, cn, tag, children }) {
 }
 
 const RZ_PRESETS = [
-  ['iPhone', 375, 812], ['iPhone 横', 812, 375], ['Duo 外屏', 466, 678], ['Duo 内屏', 669, 951],
+  ['iPhone', 390, 844], ['iPhone 横', 844, 390], ['Duo 外屏', 466, 678], ['Duo 内屏', 669, 951],
   ['Duo 内屏横', 951, 669], ['Flip 外屏', 360, 420], ['平板', 1024, 768], ['分屏小窗', 520, 440],
 ];
 
@@ -45,7 +45,7 @@ export function DeviceBar({ st, set, resolved, scale }) {
   return html`<div class="devbar">
     <div class="devbar-row">
       <${Seg} value=${st.device} onChange=${(v) => set({ device: v })} options=${[['iphone', 'iPhone'], ['duo', 'iPhone Duo'], ['resizable', 'Resizable']]} />
-      ${st.device === 'iphone' && html`<${Seg} value=${st.iphoneOrient} onChange=${(v) => set({ iphoneOrient: v })} options=${[['vertical', '竖屏 375×812'], ['horizontal', '横屏 812×375']]} />`}
+      ${st.device === 'iphone' && html`<${Seg} value=${st.iphoneOrient} onChange=${(v) => set({ iphoneOrient: v })} options=${[['vertical', '竖屏 390×844'], ['horizontal', '横屏 844×390']]} />`}
       ${st.device === 'duo' && html`<div class="segc">${Object.entries(DUO).map(([k, d]) => html`<button class=${cx(st.duo === k && 'on')} title=${`${d.en} · ${d.w} × ${d.h} pt`} onClick=${() => set({ duo: k })}><b class="dk">${k}</b>${d.name}</button>`)}</div>`}
       <span class="devbar-zoom">${Math.round(scale * 100)}%</span>
     </div>

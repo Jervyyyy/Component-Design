@@ -59,7 +59,7 @@ function VerticalBar({ theme = 'dark', showCam = true, children }) {
 // ---------------------------------------------------------------------------------------------
 function IPhone({ st, set, live }) {
   const vertical = st.iphoneOrient === 'vertical';
-  const w = vertical ? 375 : 812, h = vertical ? 812 : 375;
+  const w = vertical ? 390 : 844, h = vertical ? 844 : 390;
   const r = resolve(st, { kind: 'iphone', w, h });
   const env = {
     w, h, statusBar: vertical, topInset: 8, margin: 16, rotateHint: true,
