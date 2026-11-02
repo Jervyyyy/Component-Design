@@ -11,7 +11,6 @@ export const DEFAULTS = {
   iphoneOrient: 'vertical',  // iPhone rotation drives Video.orientation
   duo: 'A',                  // iPhone Duo posture A–E
   duoD: 'info',              // tabletop lower half: info | center
-  annotate: true,
   rz: { w: 669, h: 951 },
   // ---- TDS props (Video 主组件) ----
   hasTopBar: true,
@@ -46,18 +45,6 @@ function useSize(ref) {
   return s;
 }
 
-function Dims({ segs, top = -52, rows }) {
-  // Figma-style dimension annotation rows above a screen: [[label, width, offsetX?], ...]
-  return html`${(rows || [segs]).map((row, ri) => {
-    let x = 0;
-    return row.map(([label, w, skip]) => {
-      const el = skip ? null : html`<div class="dim-ann" style=${`left:${x}px;top:${top + ri * 33}px;width:${w}px;height:27px`}><span>${label}</span><i class="ln"></i></div>`;
-      x += w;
-      return el;
-    });
-  })}`;
-}
-
 function VerticalBar({ theme = 'dark', showCam = true, children }) {
   return html`<div class=${'vbar ' + theme}>
     ${showCam && html`<i class="cam"></i>`}
@@ -88,13 +75,12 @@ function IPhone({ st, set, live }) {
 
 function Duo({ st, set, live }) {
   const k = st.duo, spec = DUO[k];
-  const ann = st.annotate;
   const playlist = clipsOf(st.group);
   const s = player.s;
   const clip = CLIPS.find((c) => c.id === s.clipId);
   const others = playlist.filter((c) => c.id !== clip.id);
   const base = { statusBar: false, topInset: 24, playlist, group: st.group, onGroup: live.onGroup, onRotate: null };
-  let screen, r, annRows = [];
+  let screen, r;
   const pad = 14;
 
   if (k === 'A') {
@@ -109,7 +95,6 @@ function Duo({ st, set, live }) {
         ${p.hasSideRail && html`<${SideRail} hidden=${live.controlsHidden} rail=${p.rail} right=${18} bottom=${railBottom} />`}
       <//>
     </div>`;
-    annRows = [[['内容区 382', 382], ['Vertical Bar 84', 84]], [['16', 16], ['', 350, true], ['16', 16]]];
   } else if (k === 'B') {
     // 内屏竖握：TopBar 右侧避让系统保留区 151×84，trailing 止于 518；边距 32
     r = resolve(st, { kind: 'duo', w: 669, h: 951, posture: k });
@@ -117,16 +102,13 @@ function Duo({ st, set, live }) {
       <${Video} p=${r.p} env=${{ ...base, ...r.env, w: 669, h: 951, trailingInset: 151 - r.env.margin }} live=${live} />
       <div class="reserved"><span class="vb-time">9:41</span><${RawSvg} svg=${STATUS_ICONS} style="width:87px;height:22px;clip-path:inset(0 31px 0 27px);margin:0 -31px 0 -27px" /></div>
     </div>`;
-    annRows = [[['TopBar 可用 518', 518], ['保留区 151', 151]], [['32', 32], ['', 605, true], ['32', 32]]];
   } else if (k === 'C') {
     // 内屏横握：horizontal；内容区 867，不进入 Vertical Bar；展平时画面可跨折痕
     r = resolve(st, { kind: 'duo', w: 867, h: 669, posture: k });
     screen = html`<div class="screen" style="width:951px;height:669px">
       <div style="position:absolute;left:0;top:0"><${Video} p=${r.p} env=${{ ...base, ...r.env, w: 867, h: 669 }} live=${live} /></div>
       <${VerticalBar} theme="dark" showCam=${false} />
-      ${ann && html`<i class="fold-axis" style="left:475px;top:0;width:1px;height:669px"></i><span class="fold-tag" style="left:396px;top:72px">Fold · 展平时画面可跨折痕</span>`}
     </div>`;
-    annRows = [[['内容区 867', 867], ['Vertical Bar 84', 84]], [['40', 40], ['', 787, true], ['40', 40]]];
   } else if (k === 'D') {
     // 内屏半折（桌面态）：画面在上半屏 669×463.5（horizontal），ControlBar 与信息在下半屏，不跨折痕区
     const upperH = 463.5, foldH = 24, lowerTop = upperH + foldH, lowerH = 951 - lowerTop;
@@ -148,10 +130,8 @@ function Duo({ st, set, live }) {
             hasPreview=${p.cb.hasPreview} hasCounter=${false} hasChapters=${p.pb.hasChapters} ratio=${p.ratio} margin=${m} onScrub=${live.onScrub} playlist=${playlist} />`}
       </div>
       <div class="reserved"><span class="vb-time">9:41</span></div>
-      <div class="fold-region" style=${`left:0;top:${upperH}px;width:669px;height:${foldH}px;${ann ? '' : 'background:#000'}`}></div>
-      ${ann && html`<span class="fold-tag" style=${`left:210px;top:${upperH + 2.5}px`}>Folding region · 桌面态折痕水平（示意 24pt）</span>`}
+      <div class="fold-region" style=${`left:0;top:${upperH}px;width:669px;height:${foldH}px`}></div>
     </div>`;
-    annRows = [[['页面 669', 669]], [['32', 32], ['', 605, true], ['32', 32]]];
   } else {
     // 内屏半折（书本态）：播放器停靠 leading 半区（464），按半区当窗口 → vertical；trailing 放详情与选集
     r = resolve(st, { kind: 'duo', w: 464, h: 669, posture: k });
@@ -168,15 +148,11 @@ function Duo({ st, set, live }) {
         </button>`)}</div>
       </div>
       <div style="position:absolute;right:0;top:0;bottom:0;width:84px"><${VerticalBar} theme="light" showCam=${false} /></div>
-      <div class="fold-region" style=${`left:464px;top:0;width:24px;height:669px;${ann ? '' : 'background:#000'}`}></div>
-      ${ann && html`<span class="fold-tag" style="left:401px;top:626px">Folding region · 示意 24pt</span>`}
+      <div class="fold-region" style=${`left:464px;top:0;width:24px;height:669px`}></div>
     </div>`;
-    annRows = [[['播放器 464', 464], ['折痕 24', 24], ['详情 380', 380], ['84', 83]], [['16', 16], ['', 432, true], ['16', 16]]];
   }
-  const annH = ann ? 70 : 0;
-  return { r, natural: { w: spec.w + pad * 2, h: spec.h + pad * 2 + annH }, node: html`<div style=${`padding-top:${annH}px;position:relative`}>
+  return { r, natural: { w: spec.w + pad * 2, h: spec.h + pad * 2 }, node: html`<div style="position:relative">
     <div class=${cx('duo', k === 'A' && 'outer')}>
-      ${ann && html`<div style=${`position:absolute;left:${pad}px;top:${pad}px`}><${Dims} rows=${annRows} top=${-annH - pad + 4} /></div>`}
       ${screen}
     </div>
   </div>` };

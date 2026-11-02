@@ -34,7 +34,6 @@
   --text-brand: #2c61fe;
   --border-default: #d4d7de;
   --border-divider: rgba(212, 215, 222, 0.64);
-  --fold: #e82e8c;
   --font: 'Trip-Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
@@ -285,13 +284,7 @@ input { font: inherit; }
 .reserved { position: absolute; top: 0; right: 0; width: 151px; height: 84px; display: flex; align-items: center; justify-content: center; gap: 10px; color: #fff; z-index: 25; }
 .reserved .vb-time { font: 600 17px/22px -apple-system, 'SF Pro Text', var(--font); }
 
-.fold-region { position: absolute; z-index: 26; background: rgba(232, 46, 140, .14); pointer-events: none; }
-.fold-axis { position: absolute; z-index: 26; background: rgba(232, 46, 140, .6); pointer-events: none; }
-.fold-tag { position: absolute; z-index: 27; height: 19px; padding: 3px 8px; border-radius: 4px; background: var(--fold); color: #fff; font-size: 11px; line-height: 13px; font-weight: 500; white-space: nowrap; pointer-events: none; }
-.dim-ann { position: absolute; z-index: 28; pointer-events: none; color: var(--text-brand); font-size: 12px; font-weight: 500; }
-.dim-ann .ln { position: absolute; left: 0; right: 0; bottom: 0; height: 9px; border-left: 1px solid currentColor; border-right: 1px solid currentColor; }
-.dim-ann .ln::after { content: ''; position: absolute; left: 0; right: 0; top: 4px; border-top: 1px solid currentColor; }
-.dim-ann span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.fold-region { position: absolute; z-index: 26; background: #000; pointer-events: none; }
 
 /* Duo pages (NavigationSplitView content) */
 .pane-dark { position: absolute; color: #fff; background: #000; overflow: hidden; }

@@ -52,7 +52,6 @@ export function DeviceBar({ st, set, resolved, scale }) {
     ${st.device === 'duo' && html`<div class="devbar-row sub">
       <span class="devbar-meta">${DUO[st.duo].en} · ${DUO[st.duo].w} × ${DUO[st.duo].h} pt</span>
       ${st.duo === 'D' && html`<span class="devbar-item">下半屏 <${Seg} value=${st.duoD} onChange=${(v) => set({ duoD: v })} options=${[['info', '信息与选集'], ['center', '中心状态']]} /></span>`}
-      <span class="devbar-item">显示标注 <${Switch} on=${st.annotate} onChange=${(v) => set({ annotate: v })} /></span>
     </div>`}
     ${st.device === 'resizable' && html`<div class="devbar-row sub">
       <span class="devbar-meta"><b>${st.rz.w} × ${st.rz.h} pt</b> · ${CLASS_LABEL[resolved.cls]} · 拖动窗口边缘调整</span>
