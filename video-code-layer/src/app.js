@@ -169,10 +169,10 @@ function Duo({ st, set, live }) {
     const p = r.p;
     const comments = st.bookComments;
     screen = html`<div class="screen" style="width:951px;height:669px;background:#000">
-      <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 476, h: 669, railInVerticalBar: true }} live=${live} /></div>
+      <div style="position:absolute;left:0;top:0"><${Video} p=${p} env=${{ ...base, ...r.env, w: 476, h: 669, railInVerticalBar: true, mediaFullHeight: true }} live=${live} /></div>
       <i class="book-hinge"></i>
       <div class="pane-dark book-secondary">
-        ${comments ? html`<${CommentsPane} onClose=${() => set({ bookComments: false })} />` : html`<div class="book-details">
+        ${comments ? html`<${CommentsPane} closable=${false} />` : html`<div class="book-details">
           <div class="t-heading-s">${clip.title}</div>
           <div class="t-body-m meta">${clip.place} · ${fmtTime(s.duration)} · ${clip.views}</div>
           <button class="book-open-comments t-body-m" onClick=${() => set({ bookComments: true })}><${Icon} name="comment_outlined" size=${16} />${commentCount()} comments<${Icon} name="arrow_right_ios_outlined" size=${16} /></button>

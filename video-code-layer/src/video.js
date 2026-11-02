@@ -33,10 +33,11 @@ function Toast({ top }) {
 // ---------------------------------------------------------------------------------------------
 // Media (.Video.MediaPortrait / .Video.MediaLandscape)
 // ---------------------------------------------------------------------------------------------
-export function mediaLayout(W, H, orientation, ratio, withHint) {
+export function mediaLayout(W, H, orientation, ratio, withHint, fullHeight) {
   const r = RATIO[ratio];
-  if (orientation === 'horizontal') {
+  if (orientation === 'horizontal' || (fullHeight && ratio === '9:16')) {
     // 横屏：三档均为高度撑满、水平居中 (Aspect Fit when the window is narrower than the video)
+    // env.mediaFullHeight（Duo 书本态播放器）：竖屏 9:16 也高度撑满（476 半区内 376×669），控件叠在画面上
     let h = H, w = H * r;
     if (w > W) { w = W; h = W / r; }
     return { x: (W - w) / 2, y: (H - h) / 2, w, h };
@@ -307,7 +308,7 @@ export function Video({ p, env, live }) {
   const vertical = p.orientation === 'vertical';
   const scrubbing = live.scrubbing || p.cb.state === 'scrubbing';
   const showHint = vertical && p.ratio === '16:9' && env.rotateHint;
-  const rect = mediaLayout(W, H, p.orientation, p.ratio, showHint);
+  const rect = mediaLayout(W, H, p.orientation, p.ratio, showHint, env.mediaFullHeight);
   const mediaOnly = env.layout === 'mediaOnly';
 
   // Video.State: loading / error come from the instance override (CenterState) or the real player

@@ -333,6 +333,8 @@ input { font: inherit; }
 .cm-pane { position: absolute; inset: 0; display: flex; flex-direction: column; color: #fff; }
 .cm-head { flex: none; display: flex; align-items: flex-start; gap: 12px; height: 36px; margin: 24px 0 0 var(--cm-inset, 12px); width: 380px; padding-left: 12px; border-bottom: 1px solid rgba(255,255,255,.24); }
 .cm-close { width: 24px; height: 24px; color: #fff; }
+.cm-head.no-close { height: 32px; }
+.cm-head.no-close .cm-title { margin-top: 0; }
 .cm-title { margin-top: 2px; font-size: 16px; line-height: 20px; font-weight: 700; }
 .cm-list { flex: 1; min-height: 0; overflow-y: auto; margin-left: var(--cm-inset, 12px); width: 380px; scrollbar-width: none; overscroll-behavior: contain; }
 .cm-list::-webkit-scrollbar { display: none; }

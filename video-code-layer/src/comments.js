@@ -50,7 +50,7 @@ function CommentItem({ c, last }) {
 let sent = [];
 export const commentCount = () => sent.length + COMMENTS.length;
 
-export function CommentsPane({ onClose, inset = 12 }) {
+export function CommentsPane({ onClose, inset = 12, closable = true }) {
   const [mine, setMine] = useState(sent);
   const [draft, setDraft] = useState('');
   const list = [...mine, ...COMMENTS];
@@ -63,8 +63,8 @@ export function CommentsPane({ onClose, inset = 12 }) {
     setDraft('');
   };
   return html`<div class="cm-pane" style=${`--cm-inset:${inset}px`}>
-    <div class="cm-head">
-      <button class="cm-close" aria-label="Close comments" onClick=${onClose}><${Icon} name="close_outlined" size=${24} /></button>
+    <div class=${cx('cm-head', !closable && 'no-close')}>
+      ${closable && html`<button class="cm-close" aria-label="Close comments" onClick=${onClose}><${Icon} name="close_outlined" size=${24} /></button>`}
       <div class="cm-title">${list.length} comments</div>
     </div>
     <div class="cm-list">
