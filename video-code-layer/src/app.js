@@ -133,17 +133,16 @@ function Duo({ st, set, live }) {
     r = resolve(st, { kind: 'duo', w: 669, h: upperH, posture: k });
     const p = r.p, m = 32;
     const info = st.duoD === 'info';
-    // 下半屏控件与上半屏共用清屏状态：playing 3s 后一起隐藏，点上半屏画面或下半屏空白处先唤起
+    // 桌面态：下半屏控件常显（不做 3s 清屏）；单击下半屏空白处切换显隐，单击上半屏画面切换播放 / 暂停
     const state = stateOf(s, p);
-    const hidden = live.controlsHidden && state === 'playing' && !live.scrubbing && p.cb.state !== 'scrubbing';
+    const hidden = live.controlsHidden && !live.scrubbing && p.cb.state !== 'scrubbing';
     const fade = (dir) => cx('v-fade', dir, hidden && 'is-hidden');
-    const activity = () => { if (!hidden) window.dispatchEvent(new Event('tds-activity')); };
-    const reveal = (e) => { if (hidden) { e.stopPropagation(); live.setControlsHidden(false); } };
+    const toggleControls = (e) => { if (!e.target.closest('button, input, a, .pb')) live.setControlsHidden(!hidden); };
     screen = html`<div class="screen" style="width:669px;height:951px">
       <div style="position:absolute;left:0;top:0">
-        <${Video} p=${p} env=${{ ...base, ...r.env, w: 669, h: upperH, layout: 'mediaOnly', hideCenter: !info }} live=${live} />
+        <${Video} p=${p} env=${{ ...base, ...r.env, w: 669, h: upperH, layout: 'mediaOnly', hideCenter: !info, manualControls: true }} live=${live} />
       </div>
-      <div class="pane-dark tds-video" style=${`left:0;top:${lowerTop}px;width:669px;height:${lowerH}px;background:#000`} onPointerDownCapture=${activity} onClickCapture=${reveal}>
+      <div class="pane-dark tds-video" style=${`left:0;top:${lowerTop}px;width:669px;height:${lowerH}px;background:#000`} onClick=${toggleControls}>
         ${p.hasTopBar && html`<div class=${fade('up')} style="padding-top:16px"><${TopBar} margin=${m} centerSlot=${p.topBar.centerSlot} group=${st.group} onGroup=${live.onGroup} /></div>`}
         ${info ? html`<div style=${`padding:16px ${m}px 0`}>
           <div class="info"><div class="t-heading-s">${clip.title}</div><div class="t-body-m meta">${clip.place} · ${fmtTime(s.duration)} · ${clip.views}</div></div>
@@ -197,7 +196,8 @@ function stateOf(s, p) {
 
 function CenterStateLive({ p }) {
   const d = stateOf(usePlayer(), p);
-  return html`<div style="position:absolute;inset:0" onClick=${() => (d === 'playing' || d === 'paused') && player.toggle()}><${CenterState} display=${d} seek=${seekShown(p)} /></div>`;
+  // 中心按钮自身处理播放；按钮外的空白处冒泡给下半屏，切换控件显隐
+  return html`<div style="position:absolute;inset:0"><${CenterState} display=${d} seek=${seekShown(p)} /></div>`;
 }
 
 function Resizable({ st, set, live, scale }) {

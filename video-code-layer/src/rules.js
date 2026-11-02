@@ -58,6 +58,7 @@ export function resolve(state, { kind, w, h, posture }) {
   if (cb.type === 'minimal' && !na['cb.hasRotate']) na['cb.hasRotate'] = 'minimal 控制栏没有 Rotate 按钮';
   if (posture === 'D') {
     na['cb.hasCounter'] = '桌面模式：下半屏放信息与选集，不用 Counter';
+    na.autoHide = '桌面模式：控件常显，单击下半屏空白处切换显隐';
   }
   if (na['cb.hasSpeed']) cb.hasSpeed = false;
   if (na['cb.hasRotate']) cb.hasRotate = false;
@@ -85,7 +86,7 @@ export function resolve(state, { kind, w, h, posture }) {
 
   return {
     cls, na, notes,
-    p: { ...state, orientation, cb, hasSideRail, topBar },
+    p: { ...state, orientation, cb, hasSideRail, topBar, autoHide: state.autoHide && !na.autoHide },
     env: { margin, rotateHint, controlMaxWidth: cls === 'large' ? 1024 : null },
   };
 }
