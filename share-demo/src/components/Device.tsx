@@ -1,6 +1,10 @@
 import { useRef, type ReactNode } from "react";
-import type { ScreenSpec, ShareLayout } from "../lib/spec";
-import { round } from "../lib/spec";
+import type { ScreenSpec } from "../lib/spec";
+import duoOuter from "../assets/device/duo-outer.png";
+import duoInner from "../assets/device/duo-inner-landscape.png";
+import maskOuter from "../assets/device/mask-outer.png";
+import maskInnerL from "../assets/device/mask-inner-landscape.png";
+import maskInnerP from "../assets/device/mask-inner-portrait.png";
 
 /* ------------------------------------------------------------------ status glyphs */
 
@@ -62,15 +66,7 @@ function DuoStatus({ light }: { light: boolean }) {
 
 /* ------------------------------------------------------------------ chrome inside the screen */
 
-export function ScreenChrome({
-  s,
-  light,
-  annotate,
-}: {
-  s: ScreenSpec;
-  light: boolean;
-  annotate: boolean;
-}) {
+export function ScreenChrome({ s, light, posture }: { s: ScreenSpec; light: boolean; posture?: string }) {
   return (
     <div className="chrome" aria-hidden>
       {s.kind !== "duo" && <StatusBar h={s.statusBar} light={light} />}
@@ -78,91 +74,59 @@ export function ScreenChrome({
       {s.notch && <div className="notch" />}
       {s.verticalBar && (
         <div
-          className={`vbar ${annotate ? "is-annot" : ""}`}
+          className="vbar"
           style={{ width: s.verticalBar.width, height: s.verticalBar.height }}
         >
-          <span className="cam" />
+          {posture !== "A" && <span className="cam" />}
           <DuoStatus light={light} />
           <span className="pane-ctl" style={{ top: s.verticalBar.height - 86 }}>
             <i />
             <i />
             <i />
           </span>
-          {annotate && <span className="annot-tag">Vertical Bar · {s.verticalBar.width}</span>}
         </div>
       )}
       {s.reserved && (
         <div
-          className={`reserved ${annotate ? "is-annot" : ""}`}
+          className="reserved"
           style={{ left: s.reserved.x, top: s.reserved.y, width: s.reserved.w, height: s.reserved.h }}
         >
           <DuoStatus light={light} />
-          {annotate && <span className="annot-tag">Reserved Region</span>}
         </div>
       )}
       {s.crease && <div className={`crease is-${s.crease}`} />}
       {s.fold && (
-        <div className="fold" style={{ left: s.fold.x, width: s.fold.w }}>
-          {annotate && <span className="fold-tag">Folding region · reservedRegions(kind: .division) · 示意 {s.fold.w}pt</span>}
-        </div>
+        <div className="fold" style={{ left: s.fold.x, width: s.fold.w }} />
       )}
       <div className="home-ind" />
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ dimension annotations */
-
-function DimRow({ segs, total }: { segs: { w: number; label: string; strong?: boolean }[]; total: number }) {
-  return (
-    <div className="dimrow" style={{ width: total }}>
-      {segs.map((sg, i) =>
-        sg.w > 0.5 ? (
-          <div key={i} className={`dim ${sg.strong ? "is-strong" : ""}`} style={{ width: sg.w }}>
-            <span className="dim-label">{sg.label}</span>
-            <span className="dim-line" />
-          </div>
-        ) : null,
-      )}
-    </div>
-  );
-}
-
-export function Dimensions({ s, layout, hasMedia, mediaW }: { s: ScreenSpec; layout: ShareLayout; hasMedia: boolean; mediaW?: number }) {
-  const { panel, media } = layout;
-  const mw = mediaW ?? media.w;
-  const mx = media.x + (media.w - mw) / 2;
-  const rows = [];
-  if (hasMedia) {
-    rows.push(
-      <DimRow
-        key="m"
-        total={s.w}
-        segs={[
-          { w: mx, label: `${round(mx)}` },
-          { w: mw, label: `分享图 ${round(mw)}`, strong: true },
-          { w: s.w - mx - mw, label: `${round(s.w - mx - mw)}` },
-        ]}
-      />,
-    );
-  }
-  rows.push(
-    <DimRow
-      key="p"
-      total={s.w}
-      segs={[
-        { w: panel.x, label: `${round(panel.x)}` },
-        { w: panel.w, label: `面板 ${round(panel.w)}`, strong: true },
-        { w: s.w - panel.x - panel.w, label: `${round(s.w - panel.x - panel.w)}` },
-      ]}
-    />,
-  );
-  return <div className="dims">{rows}</div>;
-}
-
 /* ------------------------------------------------------------------ frame */
 
-export const FRAME_PAD = { iphone: 14, duo: 14, custom: 10 } as const;
+export const FRAME_PAD = { iphone: 14, custom: 10 } as const;
+
+/**
+ * iPhone DUO mockups exported from the Figma "Share 分享 · iPhone Duo 适配" frame
+ * (outer 524.67 × 731.33 around a 466 × 678 screen; inner 1031 × 749 around 951 × 669).
+ * The screen is clipped with a mask traced from the mockup's own screen cut-out.
+ */
+const DUO_MOCK = {
+  A: { img: duoOuter, w: 524.67, h: 731.33, x: 29, y: 27, mask: maskOuter, rotate: false },
+  B: { img: duoInner, w: 749, h: 1031, x: 40, y: 40, mask: maskInnerP, rotate: true },
+  C: { img: duoInner, w: 1031, h: 749, x: 40, y: 40, mask: maskInnerL, rotate: false },
+  D: { img: duoInner, w: 1031, h: 749, x: 40, y: 40, mask: maskInnerL, rotate: false },
+} as const;
+
+export function frameSize(s: ScreenSpec, posture?: string) {
+  if (s.kind === "duo" && posture) {
+    const m = DUO_MOCK[posture as keyof typeof DUO_MOCK];
+    return { w: m.w, h: m.h };
+  }
+  const pad = FRAME_PAD[s.kind as "iphone" | "custom"];
+  return { w: s.w + pad * 2, h: s.h + pad * 2 };
+}
 
 export function DeviceFrame({
   s,
@@ -177,7 +141,6 @@ export function DeviceFrame({
   onResize?: (w: number, h: number) => void;
   scale: number;
 }) {
-  const pad = FRAME_PAD[s.kind];
   const drag = useRef<{ x: number; y: number; w: number; h: number; mode: string } | null>(null);
 
   const start = (mode: string) => (e: React.PointerEvent) => {
@@ -195,9 +158,46 @@ export function DeviceFrame({
   };
   const end = () => (drag.current = null);
 
+  if (s.kind === "duo" && posture) {
+    const m = DUO_MOCK[posture as keyof typeof DUO_MOCK];
+    const mask = `url("${m.mask}")`;
+    return (
+      <div className={`frame-mock posture-${posture}`} style={{ width: m.w, height: m.h }}>
+        <div
+          className="screen"
+          style={{
+            position: "absolute",
+            left: m.x,
+            top: m.y,
+            width: s.w,
+            height: s.h,
+            WebkitMaskImage: mask,
+            maskImage: mask,
+            WebkitMaskSize: "100% 100%",
+            maskSize: "100% 100%",
+          }}
+        >
+          {children}
+        </div>
+        <img
+          className="mock-img"
+          src={m.img}
+          alt=""
+          draggable={false}
+          style={
+            m.rotate
+              ? { width: m.h, height: m.w, left: (m.w - m.h) / 2, top: (m.h - m.w) / 2, transform: "rotate(90deg)" }
+              : { width: m.w, height: m.h, left: 0, top: 0 }
+          }
+        />
+      </div>
+    );
+  }
+
+  const pad = FRAME_PAD[s.kind as "iphone" | "custom"];
   return (
     <div
-      className={`frame kind-${s.kind} ${posture ? `posture-${posture}` : ""}`}
+      className={`frame kind-${s.kind}`}
       style={{
         width: s.w + pad * 2,
         height: s.h + pad * 2,
@@ -208,7 +208,6 @@ export function DeviceFrame({
       <span className="btn btn-a" />
       <span className="btn btn-b" />
       <span className="btn btn-c" />
-      {s.kind === "duo" && <span className="hinge" />}
       <div className="screen" style={{ width: s.w, height: s.h, borderRadius: s.radius }}>
         {children}
       </div>

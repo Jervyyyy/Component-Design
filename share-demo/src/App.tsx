@@ -5,7 +5,7 @@ import { useSize } from "./lib/hooks";
 import { getRows, isAction, LABELS, type TargetId } from "./data/channels";
 import { t } from "./data/i18n";
 import { Controls } from "./components/Controls";
-import { DeviceFrame, Dimensions, FRAME_PAD, ScreenChrome } from "./components/Device";
+import { DeviceFrame, frameSize, ScreenChrome } from "./components/Device";
 import { Share } from "./components/Share";
 import { Icon } from "./components/Icon";
 import { TripPage, type PageInsets } from "./scenes/Pages";
@@ -187,11 +187,9 @@ export default function App() {
   /* ---------------------------------------------------------------- stage scale */
 
   const [stageRef, stage] = useSize<HTMLDivElement>();
-  const pad = FRAME_PAD[screen.kind];
-  const frameW = screen.w + pad * 2;
-  const frameH = screen.h + pad * 2;
-  const dimsH = cfg.annotate ? (cfg.hasMedia ? 64 : 34) : 0;
-  const outerH = frameH + dimsH + 36;
+  const posture = cfg.device === "duo" ? cfg.posture : undefined;
+  const { w: frameW, h: frameH } = frameSize(screen, posture);
+  const outerH = frameH;
   const fit = Math.min(1, (stage.w - 64) / frameW, (stage.h - 48) / outerH);
   const scale = cfg.zoom === "100" ? 1 : Math.max(0.2, fit || 1);
 
@@ -219,9 +217,6 @@ export default function App() {
             <span>{screen.sub}</span>
           </div>
           <div className="stage-tools">
-            <button type="button" className={cfg.annotate ? "on" : ""} onClick={() => set("annotate", !cfg.annotate)}>
-              标注
-            </button>
             <button type="button" className={cfg.zoom === "fit" ? "on" : ""} onClick={() => set("zoom", "fit")}>
               适应
             </button>
@@ -233,12 +228,9 @@ export default function App() {
         <div ref={stageRef} className={`stage-canvas ${cfg.zoom === "100" ? "is-scroll" : ""}`}>
           <div className="stage-sizer" style={{ width: frameW * scale, height: outerH * scale }}>
           <div className="stage-scaler" style={{ transform: `scale(${scale})`, width: frameW, height: outerH }}>
-            <div className="dims-wrap" style={{ height: dimsH, paddingLeft: pad, paddingRight: pad }}>
-              {cfg.annotate && (open || !!preparing) && <Dimensions s={screen} layout={layout} hasMedia={cfg.hasMedia} mediaW={mediaW} />}
-            </div>
             <DeviceFrame
               s={screen}
-              posture={cfg.device === "duo" ? cfg.posture : undefined}
+              posture={posture}
               scale={scale}
               onResize={cfg.device === "custom" ? onResize : undefined}
             >
@@ -278,11 +270,8 @@ export default function App() {
                   {toast.text}
                 </div>
               )}
-              <ScreenChrome s={screen} light={statusLight} annotate={cfg.annotate} />
+              <ScreenChrome s={screen} light={statusLight} posture={posture} />
             </DeviceFrame>
-            <div className="frame-caption">
-              {screen.kind === "duo" ? screen.name.replace("iPhone DUO · ", "") : screen.name} · {screen.w} × {screen.h}
-            </div>
           </div>
           </div>
         </div>

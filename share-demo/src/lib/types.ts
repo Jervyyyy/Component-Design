@@ -43,7 +43,6 @@ export interface Config {
 
   flowLoading: boolean;
   loadingMs: number;
-  annotate: boolean;
   zoom: "fit" | "100";
 }
 
@@ -84,6 +83,5 @@ export const DEFAULT_CONFIG: Config = {
 
   flowLoading: true,
   loadingMs: 1200,
-  annotate: true,
   zoom: "fit",
 };

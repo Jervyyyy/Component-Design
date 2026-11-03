@@ -332,7 +332,6 @@ export function Controls({
         <Field label="loading 时长">
           <Slider value={cfg.loadingMs} min={300} max={4000} step={100} onChange={(v) => set("loadingMs", v)} unit="ms" />
         </Field>
-        <Toggle label="显示尺寸标注" sub="面板 / 分享图宽度与边距" value={cfg.annotate} onChange={(v) => set("annotate", v)} />
       </Section>
 
       <section className="c-readout">
