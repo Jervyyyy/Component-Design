@@ -8,6 +8,7 @@ import { Controls } from "./components/Controls";
 import { DeviceFrame, frameSize, ScreenChrome } from "./components/Device";
 import { Share } from "./components/Share";
 import { Icon } from "./components/Icon";
+import globalLoading from "./assets/icons/global-loading.svg";
 import { TripPage, type PageInsets } from "./scenes/Pages";
 
 const SHARE_KEYS: (keyof Config)[] = [
@@ -182,7 +183,8 @@ export default function App() {
       : split.left + split.gap + (contentW - split.left - split.gap) / 2
     : contentW / 2;
 
-  const statusLight = open || !!preparing || (cfg.scenario === "hotel" && !split);
+  // the Loading overlay sits above the status bar (dimmed by the scrim), as in the Guideline flow
+  const statusLight = open || (cfg.scenario === "hotel" && !split);
 
   /* ---------------------------------------------------------------- stage scale */
 
@@ -258,9 +260,9 @@ export default function App() {
                 <div className="prep-card" style={{ left: triggerCenter }}>
                   <div className="prep-box">
                     <button type="button" className="prep-x" onClick={cancelPreparing} aria-label="Cancel">
-                      <Icon name="close" size={12} color="#8592a6" />
+                      <Icon name="close" size={14} color="#c3c7cf" />
                     </button>
-                    <span className="trip-loader" />
+                    <img className="prep-icon" src={globalLoading} width={44} height={44} alt="" />
                   </div>
                   <span className="prep-text">{preparing === "image" ? t("preparing", cfg.lang) : t("loading", cfg.lang)}</span>
                 </div>
@@ -270,7 +272,7 @@ export default function App() {
                   {toast.text}
                 </div>
               )}
-              <ScreenChrome s={screen} light={statusLight} posture={posture} />
+              <ScreenChrome s={screen} light={statusLight} posture={posture} dim={!!preparing} />
             </DeviceFrame>
           </div>
           </div>

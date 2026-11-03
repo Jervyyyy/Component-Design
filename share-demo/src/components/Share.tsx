@@ -206,7 +206,11 @@ function MediaStatus({ state, lang, onRetry }: { state: ImageState; lang: Lang; 
   if (state === "loading") {
     return (
       <div className="media-status">
-        <span className="spinner light" />
+        <span className="petals" aria-hidden>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <i key={i} style={{ transform: `rotate(${i * 45}deg)`, animationDelay: `${(i - 8) * 0.1}s` }} />
+          ))}
+        </span>
         <span>{t("loading", lang)}</span>
       </div>
     );

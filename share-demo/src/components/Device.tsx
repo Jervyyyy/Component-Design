@@ -66,9 +66,9 @@ function DuoStatus({ light }: { light: boolean }) {
 
 /* ------------------------------------------------------------------ chrome inside the screen */
 
-export function ScreenChrome({ s, light, posture }: { s: ScreenSpec; light: boolean; posture?: string }) {
+export function ScreenChrome({ s, light, posture, dim }: { s: ScreenSpec; light: boolean; posture?: string; dim?: boolean }) {
   return (
-    <div className="chrome" aria-hidden>
+    <div className={`chrome ${dim ? "is-dim" : ""}`} aria-hidden>
       {s.kind !== "duo" && <StatusBar h={s.statusBar} light={light} />}
       {s.island && <div className="island" />}
       {s.notch && <div className="notch" />}

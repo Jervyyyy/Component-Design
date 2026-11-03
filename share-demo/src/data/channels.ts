@@ -109,7 +109,8 @@ export function getRows(
     if (layout === "singleRow") {
       return { rows: [["save", "whatsapp", "instagram", "telegram", "kakaotalk", "snapchat", "messenger"]] };
     }
-    return { rows: [channels[scenario], ["save", "copyLink", "message", "email", "more"]] };
+    // Guideline · 分享 loading 路径: image mode keeps the same two rows as the panel
+    return { rows: [channels[scenario], actions[scenario]] };
   }
   if (layout === "singleRow") {
     // spec default single-row order: WhatsApp › Messenger › Text Message › Copy link › (Save) › More

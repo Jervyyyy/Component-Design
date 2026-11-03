@@ -608,22 +608,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 16px; /* Space/M */
   transition: left 0.4s ease;
 }
 .prep-box {
   position: relative;
-  width: 76px;
-  height: 76px;
-  border-radius: 8px;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px; /* Radius/M */
   background: #fff;
   display: grid;
   place-items: center;
 }
 .prep-x {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 6px;
+  right: 6px;
   width: 16px;
   height: 16px;
   padding: 0;
@@ -635,26 +635,43 @@
 }
 .prep-text {
   color: #fff;
-  font-size: 13px;
+  font-size: 14px; /* Body/M */
+  line-height: 1.5;
 }
-.trip-loader {
+.prep-icon {
+  display: block;
+  animation: prep-breathe 1.2s ease-in-out infinite;
+}
+@keyframes prep-breathe {
+  50% {
+    transform: translateY(-2px);
+    opacity: 0.75;
+  }
+}
+/* iOS-style activity indicator used for Image · state=loading */
+.petals {
   position: relative;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid #e7edff;
-  border-top-color: var(--brand);
-  animation: spin 0.9s linear infinite;
+  width: 24px;
+  height: 24px;
 }
-.trip-loader::after {
-  content: "";
+.petals i {
   position: absolute;
-  top: -5px;
-  right: -1px;
-  width: 7px;
+  left: 11px;
+  top: 0;
+  width: 2px;
   height: 7px;
-  border-radius: 50%;
-  background: #ff9500;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  transform-origin: 1px 12px;
+  animation: petal 0.8s linear infinite;
+}
+@keyframes petal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.18;
+  }
 }
 
 /* ---------------------------------------------------------------- Toast */

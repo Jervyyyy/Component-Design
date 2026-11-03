@@ -234,17 +234,6 @@ export function Controls({
             </button>
           ))}
         </div>
-        <Field label="语言" sub="多语言适配：label 最多 2 行，超出省略">
-          <Seg
-            value={cfg.lang}
-            onChange={(v) => set("lang", v)}
-            options={[
-              { v: "en", label: "English" },
-              { v: "zh", label: "简体中文" },
-              { v: "de", label: "Deutsch" },
-            ]}
-          />
-        </Field>
       </Section>
 
       <Section title="Share">
