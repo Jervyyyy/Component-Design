@@ -8,7 +8,7 @@ import { Controls } from "./components/Controls";
 import { DeviceFrame, frameSize, ScreenChrome } from "./components/Device";
 import { Share } from "./components/Share";
 import { Icon } from "./components/Icon";
-import globalLoading from "./assets/icons/global-loading.svg";
+import { LoadingMark } from "./components/LoadingMark";
 import { TripPage, type PageInsets } from "./scenes/Pages";
 
 const SHARE_KEYS: (keyof Config)[] = [
@@ -270,7 +270,7 @@ export default function App() {
                     <button type="button" className="prep-x" onClick={cancelPreparing} aria-label="Cancel">
                       <Icon name="close" size={14} color="#c3c7cf" />
                     </button>
-                    <img className="prep-icon" src={globalLoading} width={44} height={44} alt="" />
+                    <LoadingMark key={String(preparing)} size={44} />
                   </div>
                   <span className="prep-text">{preparing === "image" ? t("preparing", cfg.lang) : t("loading", cfg.lang)}</span>
                 </div>

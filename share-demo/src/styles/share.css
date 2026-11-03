@@ -612,9 +612,10 @@
   background: var(--scrim);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.13s ease-out;
+  transition: opacity 0.17s ease-out;
 }
 .prep.is-on {
+  transition: none; /* recording: scrim + card cut in on the tap */
   opacity: 1;
   pointer-events: auto;
 }
@@ -655,22 +656,128 @@
   font-size: 14px; /* Body/M */
   line-height: 1.5;
 }
-.prep-icon {
+/* Loading mark — draw-on motion from the reference recording (≈0.85s draw, then hold; loops while loading) */
+.lmark {
   display: block;
-  animation: prep-breathe 1.2s ease-in-out infinite;
+  overflow: visible;
+  --cycle: 1.6s;
 }
-/* recording: icon opacity breathes 1 → 0.7 → 1 on a 1.2s loop, holding at both ends */
-@keyframes prep-breathe {
-  0%,
-  15% {
-    opacity: 1;
+.lmark > * {
+  animation-duration: var(--cycle);
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.lmark-body {
+  animation-name: lmark-settle;
+  transform-origin: 12px 12px;
+}
+.lmark-mtn {
+  stroke-dasharray: 1;
+  animation: lmark-draw var(--cycle) infinite;
+}
+.lmark-sun {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: lmark-sun;
+}
+.lmark-l1,
+.lmark-l2 {
+  stroke-dasharray: 1;
+}
+.lmark-l1 {
+  animation-name: lmark-l1;
+}
+.lmark-l2 {
+  animation-name: lmark-l2;
+}
+@keyframes lmark-settle {
+  0% {
+    transform: translate(-4px, 3px);
   }
-  50%,
-  65% {
-    opacity: 0.7;
+  38% {
+    transform: translate(0, 0);
+    animation-timing-function: ease-out;
   }
   100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes lmark-draw {
+  0% {
+    stroke-dashoffset: 1;
     opacity: 1;
+    animation-timing-function: cubic-bezier(0.35, 0, 0.25, 1);
+  }
+  53% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes lmark-sun {
+  0% {
+    transform: translate(-14px, 8px) scale(0.12);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  20% {
+    transform: translate(-12px, 4px) scale(0.6);
+  }
+  34% {
+    transform: translate(-3px, 0.5px) scale(0.95);
+  }
+  42% {
+    transform: none;
+  }
+  88% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+/* horizon lines: each half is its own path drawn from the centre */
+@keyframes lmark-l1 {
+  0%,
+  33% {
+    stroke-dashoffset: 1;
+    animation-timing-function: ease-out;
+  }
+  46% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes lmark-l2 {
+  0%,
+  40% {
+    stroke-dashoffset: 1;
+    animation-timing-function: ease-out;
+  }
+  53% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
   }
 }
 /* iOS-style activity indicator used for Image · state=loading */
