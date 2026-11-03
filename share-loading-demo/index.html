@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Share Loading Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="device" id="device">
+    <!-- Step 1 · Itinerary page (design export of "Itinerary / Overview (TDS)") -->
+    <div class="page">
+      <img class="page__img" src="./assets/itinerary.png" alt="Itinerary overview" />
+      <button class="share-hotspot" id="shareBtn" aria-label="Share this itinerary"></button>
+    </div>
+
+    <!-- Step 2 · Global loading (2s) -->
+    <div class="global-loading" id="globalLoading" aria-hidden="true">
+      <div class="global-loading__box">
+        <button class="global-loading__close" id="loadingClose" aria-label="Cancel">
+          <img src="./assets/loading-close.svg" width="16" height="16" alt="" />
+        </button>
+        <div class="global-loading__icon">
+          <img src="./assets/global-loading.svg" width="44" height="44" alt="" />
+        </div>
+      </div>
+      <p class="global-loading__text">Loading…</p>
+    </div>
+
+    <!-- Step 3/4 · Share sheet (hasMedia, type=scroll) -->
+    <div class="share" id="share" aria-hidden="true">
+      <header class="nav">
+        <div class="status-bar">
+          <span class="status-bar__time">9:41</span>
+          <img class="status-bar__icons" src="./assets/status-icons.svg" width="94" height="22" alt="" />
+        </div>
+        <div class="nav__bar">
+          <button class="nav__close" id="shareClose" aria-label="Close">
+            <img src="./assets/close.svg" width="24" height="24" alt="" />
+          </button>
+          <h1 class="nav__title">Share as image</h1>
+        </div>
+      </header>
+
+      <section class="media" id="media">
+        <!-- Media loading (1.5s) -->
+        <div class="media__loading" id="mediaLoading">
+          <img class="spinner" src="./assets/loading-ios.svg" width="24" height="24" alt="" />
+          <p>Loading…</p>
+        </div>
+
+        <!-- Long image -->
+        <div class="media__scroll" id="mediaScroll">
+          <article class="poster">
+            <div class="poster__map"><img src="./assets/map.png" alt="Route map" /></div>
+            <div class="poster__body">
+              <div class="poster__heading">
+                <div class="poster__author">
+                  <img src="./assets/avatar.png" width="20" height="20" alt="" />
+                  <span>GianGian</span>
+                </div>
+                <h2 class="poster__title">London &amp; Edinburgh 7-Day Tour: British Museum, Thames River Cruise, Arthur’s Seat Hiking</h2>
+                <p class="poster__meta">Jul 30 – Aug 5&nbsp;&nbsp;·&nbsp;&nbsp;2 cities&nbsp;&nbsp;·&nbsp;&nbsp;17 places</p>
+              </div>
+              <ol class="poster__days" id="days"></ol>
+            </div>
+            <footer class="poster__footer">
+              <div class="poster__qr"><img src="./assets/qr.svg" width="64" height="64" alt="QR code" /></div>
+              <div class="poster__cta">
+                <strong>Scan the QR code to view the itinerary</strong>
+                <span>You can copy this itinerary to share with others</span>
+              </div>
+            </footer>
+          </article>
+        </div>
+        <div class="media__hint" id="mediaHint"><span>Scroll down to see full image</span></div>
+      </section>
+
+      <div class="surface" id="surface">
+        <div class="panel">
+          <div class="row" id="channels"></div>
+          <div class="row" id="actions"></div>
+        </div>
+      </div>
+
+      <div class="home-indicator"><span></span></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
