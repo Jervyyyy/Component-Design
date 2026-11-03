@@ -234,16 +234,6 @@ export function Controls({
             </button>
           ))}
         </div>
-        <Field label="渠道区域">
-          <Seg
-            value={cfg.region}
-            onChange={(v) => set("region", v)}
-            options={[
-              { v: "intl", label: "海外 International" },
-              { v: "cn", label: "中国大陆" },
-            ]}
-          />
-        </Field>
         <Field label="语言" sub="多语言适配：label 最多 2 行，超出省略">
           <Seg
             value={cfg.lang}

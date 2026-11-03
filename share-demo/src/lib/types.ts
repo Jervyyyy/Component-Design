@@ -55,7 +55,7 @@ export const RATIO_VALUE: Record<Ratio, number> = {
 };
 
 export const DEFAULT_CONFIG: Config = {
-  device: "duo",
+  device: "iphone",
   iphone: "iphone16",
   posture: "A",
   bookSide: "left",
