@@ -1,0 +1,417 @@
+/* ============================================================================
+   Device frames + system chrome
+   ========================================================================== */
+
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  background: #0b0b0d;
+  box-shadow:
+    0 0 0 2px #3b3b40,
+    0 0 0 3px #1c1c1f,
+    0 40px 80px -20px rgba(17, 24, 39, 0.35),
+    0 12px 28px rgba(17, 24, 39, 0.18);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s;
+}
+.frame.kind-duo {
+  background: #0d0d0f;
+  box-shadow:
+    0 0 0 2px #c9c2b1,
+    0 0 0 4px #9d978a,
+    0 0 0 5px #6f6a60,
+    0 40px 80px -20px rgba(17, 24, 39, 0.35),
+    0 12px 28px rgba(17, 24, 39, 0.18);
+}
+.frame.kind-custom {
+  background: #16171a;
+  box-shadow:
+    0 0 0 1px #2f3036,
+    0 30px 60px -20px rgba(17, 24, 39, 0.3),
+    0 8px 20px rgba(17, 24, 39, 0.14);
+}
+.frame.kind-custom .btn {
+  display: none;
+}
+
+.screen {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s;
+}
+
+/* hardware buttons */
+.btn {
+  position: absolute;
+  background: linear-gradient(90deg, #2c2c30, #4a4a50);
+  border-radius: 2px;
+}
+.kind-iphone .btn-a {
+  left: -5px;
+  top: 22%;
+  width: 3px;
+  height: 56px;
+}
+.kind-iphone .btn-b {
+  left: -5px;
+  top: calc(22% + 70px);
+  width: 3px;
+  height: 56px;
+}
+.kind-iphone .btn-c {
+  right: -5px;
+  top: 28%;
+  width: 3px;
+  height: 90px;
+}
+.kind-duo .btn {
+  background: linear-gradient(180deg, #d8d2c3, #9d978a);
+}
+.kind-duo .btn-a {
+  top: -6px;
+  left: 18%;
+  width: 52px;
+  height: 3px;
+}
+.kind-duo .btn-b {
+  top: -6px;
+  left: calc(18% + 64px);
+  width: 52px;
+  height: 3px;
+}
+.kind-duo .btn-c {
+  right: -6px;
+  top: 30%;
+  width: 3px;
+  height: 64px;
+}
+.hinge {
+  position: absolute;
+  display: none;
+  background: repeating-linear-gradient(180deg, #cfc8b8 0 26px, #a29c8f 26px 28px);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.posture-A .hinge {
+  display: block;
+  left: -10px;
+  top: 6%;
+  bottom: 6%;
+  width: 7px;
+}
+.posture-D .hinge {
+  display: block;
+  left: calc(50% - 14px);
+  bottom: -9px;
+  width: 28px;
+  height: 6px;
+  background: linear-gradient(90deg, #a29c8f, #e0d9c9, #a29c8f);
+}
+
+/* custom resize handles */
+.rz {
+  position: absolute;
+  z-index: 5;
+  touch-action: none;
+}
+.rz-x {
+  right: -18px;
+  top: 50%;
+  width: 8px;
+  height: 64px;
+  margin-top: -32px;
+  border-radius: 4px;
+  background: #b9bec9;
+  cursor: ew-resize;
+}
+.rz-y {
+  bottom: -18px;
+  left: 50%;
+  width: 64px;
+  height: 8px;
+  margin-left: -32px;
+  border-radius: 4px;
+  background: #b9bec9;
+  cursor: ns-resize;
+}
+.rz-xy {
+  right: -22px;
+  bottom: -22px;
+  width: 18px;
+  height: 18px;
+  border-right: 3px solid #3264ff;
+  border-bottom: 3px solid #3264ff;
+  border-radius: 0 0 6px 0;
+  cursor: nwse-resize;
+}
+.rz:hover {
+  background-color: #3264ff;
+}
+.rz-xy:hover {
+  background: rgba(50, 100, 255, 0.12);
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.app-window {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #f6f7fa;
+  transition: right 0.4s ease;
+}
+
+.chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px 6px 48px;
+  transition: color 0.25s;
+}
+.kind-custom .statusbar {
+  padding: 0 18px;
+}
+.sb-time {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.kind-custom .sb-time {
+  font-size: 13px;
+}
+.sb-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kind-custom .sb-icons {
+  transform: scale(0.8);
+  transform-origin: right center;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 124px;
+  height: 36px;
+  margin-left: -62px;
+  border-radius: 20px;
+  background: #000;
+}
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 162px;
+  height: 32px;
+  margin-left: -81px;
+  border-radius: 0 0 20px 20px;
+  background: #000;
+}
+
+.vbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: height 0.4s ease;
+}
+.vbar .cam {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #2f3a4f 0 18%, #07080a 45%);
+  box-shadow: 0 0 0 3px #000;
+}
+.duo-status {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.25s;
+}
+.duo-time {
+  font-size: 14px;
+  font-weight: 600;
+}
+.duo-ring {
+  width: 34px;
+  height: 34px;
+  border: 1.5px dashed;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.reserved {
+  position: absolute;
+}
+.reserved .annot-tag {
+  top: auto;
+  bottom: 4px;
+}
+.reserved .duo-status {
+  top: 24px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+.pane-ctl {
+  position: absolute;
+  left: 50%;
+  width: 40px;
+  height: 16px;
+  margin-left: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.pane-ctl i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(130, 136, 150, 0.7);
+}
+.is-annot {
+  outline: 1px dashed rgba(50, 100, 255, 0.7);
+  outline-offset: -1px;
+  background: rgba(50, 100, 255, 0.07);
+}
+.annot-tag {
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3264ff;
+  font-size: 9px;
+  font-weight: 600;
+}
+.crease {
+  position: absolute;
+}
+.crease.is-vertical {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  margin-left: -1.5px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.03));
+}
+.crease.is-horizontal {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.03));
+}
+.fold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.02));
+}
+.fold-tag {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #ffe1ea;
+  color: #e5004c;
+  font-size: 10px;
+  font-weight: 600;
+}
+.home-ind {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  margin-left: -67px;
+  border-radius: 3px;
+  background: #121826;
+}
+
+/* ---------------------------------------------------------------- dimension rows (outside the frame) */
+
+.dims-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  padding-bottom: 10px;
+}
+.dims {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dimrow {
+  display: flex;
+}
+.dim {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 24px;
+  min-width: 0;
+  transition: width 0.4s ease;
+}
+.dim-label {
+  margin-bottom: 3px;
+  font-size: 11px;
+  line-height: 1;
+  color: #3264ff;
+  white-space: nowrap;
+}
+.dim.is-strong .dim-label {
+  font-weight: 600;
+}
+.dim-line {
+  position: relative;
+  width: 100%;
+  height: 9px;
+  border-left: 1px solid #3264ff;
+  border-right: 1px solid #3264ff;
+}
+.dim-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 1px;
+  background: #3264ff;
+}
