@@ -82,6 +82,6 @@ export const DEFAULT_CONFIG: Config = {
   disabledDemo: false,
 
   flowLoading: true,
-  loadingMs: 1200,
+  loadingMs: 2000,
   zoom: "fit",
 };

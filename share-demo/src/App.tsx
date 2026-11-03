@@ -38,6 +38,8 @@ export default function App() {
   const [pulse, setPulse] = useState(false);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const [side, setSide] = useState<BookSide>("left");
+  // when the sheet takes over from the Loading card the scrim is already up: keep it constant (no crossfade dip)
+  const [handoff, setHandoff] = useState(false);
   const [mediaW, setMediaW] = useState<number | undefined>(undefined);
   const timers = useRef<number[]>([]);
   const panelLayout = useRef<Config["layout"]>(DEFAULT_CONFIG.layout);
@@ -73,16 +75,19 @@ export default function App() {
     if (cfgRef.current.device === "duo" && cfgRef.current.posture === "D") setCfg((p) => ({ ...p, bookSide: from }));
     const c = cfgRef.current;
     if (!c.flowLoading) {
+      setHandoff(false);
       setOpen(true);
       return;
     }
     setPreparing("page");
     later(() => {
+      setHandoff(true);
       setPreparing(null);
       setOpen(true);
       if (c.hasMedia) {
         setMediaLoading(true);
-        later(() => setMediaLoading(false), c.loadingMs);
+        // recording: image generation ≈ 0.6 × the page loading time (2.0s → 1.2s)
+        later(() => setMediaLoading(false), Math.round(c.loadingMs * 0.6));
       }
     }, c.loadingMs);
   };
@@ -90,6 +95,7 @@ export default function App() {
   const close = () => {
     clearTimers();
     setOpen(false);
+    setHandoff(false);
     setPreparing(null);
     setMediaLoading(false);
     setFromPanel(false);
@@ -117,6 +123,7 @@ export default function App() {
           // Behavior · 分享为图片：面板只保留一行渠道
           setCfg((p) => ({ ...p, hasMedia: true, layout: "singleRow" }));
           setFromPanel(true);
+          setHandoff(true);
           setPreparing(null);
           setOpen(true);
         }, c.loadingMs);
@@ -255,8 +262,9 @@ export default function App() {
                 onContact={(n) => showToast(t("opening", cfg.lang, n))}
                 onRetry={onRetry}
                 onMediaW={setMediaW}
+                handoff={handoff}
               />
-              <div className={`prep ${preparing ? "is-on" : ""}`}>
+              <div className={`prep ${preparing ? "is-on" : ""} ${handoff ? "is-handoff" : ""}`}>
                 <div className="prep-card" style={{ left: triggerCenter }}>
                   <div className="prep-box">
                     <button type="button" className="prep-x" onClick={cancelPreparing} aria-label="Cancel">

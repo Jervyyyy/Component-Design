@@ -394,9 +394,10 @@ export interface ShareProps {
   onContact: (name: string) => void;
   onRetry: () => void;
   onMediaW?: (w: number) => void;
+  handoff?: boolean;
 }
 
-export function Share({ screen, layout, cfg, open, imageState, showBack, onClose, onBack, onTarget, onContact, onRetry, onMediaW }: ShareProps) {
+export function Share({ screen, layout, cfg, open, imageState, showBack, onClose, onBack, onTarget, onContact, onRetry, onMediaW, handoff }: ShareProps) {
   const lang = cfg.lang;
   const { rows } = getRows(cfg.scenario, cfg.region, cfg.layout, cfg.hasMedia);
   const firstChannelIdx = rows[0].findIndex((id) => !isAction(id));
@@ -405,7 +406,7 @@ export function Share({ screen, layout, cfg, open, imageState, showBack, onClose
   const { panel, region } = layout;
 
   return (
-    <div className={`share ${open ? "is-open" : ""} ${cfg.hasMedia ? "has-media" : ""}`} aria-hidden={!open}>
+    <div className={`share ${open ? "is-open" : ""} ${cfg.hasMedia ? "has-media" : ""} ${handoff ? "is-handoff" : ""}`} aria-hidden={!open}>
       <div className="share-scrim" onClick={cfg.hasMedia ? undefined : onClose} />
       <div className="share-col" style={{ left: region.x, width: region.w }}>
         {cfg.hasMedia && (
