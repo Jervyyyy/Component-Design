@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { Config, Posture } from "../lib/types";
 import { CUSTOM_PRESETS, IPHONES, POSTURES, round, type ItemRule, type ScreenSpec, type ShareLayout } from "../lib/spec";
 import { SCENARIOS } from "../data/scenarios";
-import tripLogo from "../assets/img/trip-logo.png";
 import mapImg from "../assets/img/itinerary-map.jpg";
 import nyc from "../assets/img/new-york.jpg";
 import room from "../assets/img/hotel-room.jpg";
@@ -117,11 +116,7 @@ export function Controls({
   return (
     <aside className="controls">
       <div className="c-brand">
-        <img src={tripLogo} alt="Trip.com" />
-        <div>
-          <h1>Share 分享 · 交互 Demo</h1>
-          <p>TDS 2026 · iPhone / iPhone DUO / Resizable</p>
-        </div>
+        <h1>Share 分享 · 交互 Demo</h1>
       </div>
 
       <div className="c-actions">

@@ -46,19 +46,10 @@ button {
   gap: 12px;
   padding-bottom: 14px;
 }
-.c-brand img {
-  width: 58px;
-  height: auto;
-}
 .c-brand h1 {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-}
-.c-brand p {
-  margin: 2px 0 0;
-  font-size: 11px;
-  color: #6b7280;
 }
 .c-actions {
   display: grid;
