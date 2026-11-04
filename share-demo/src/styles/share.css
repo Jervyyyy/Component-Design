@@ -851,3 +851,12 @@
   height: 116px;
   padding-bottom: 32px;
 }
+
+/* the sheet always paints above the preview (the long image tucks under its rounded top) */
+.surface-wrap {
+  position: relative;
+  z-index: 2;
+}
+.media {
+  z-index: 1;
+}
