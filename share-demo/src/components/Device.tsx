@@ -5,6 +5,8 @@ import duoInner from "../assets/device/duo-inner-landscape.png";
 import maskOuter from "../assets/device/mask-outer.png";
 import maskInnerL from "../assets/device/mask-inner-landscape.png";
 import maskInnerP from "../assets/device/mask-inner-portrait.png";
+import duoCamera from "../assets/device/duo-camera.png";
+import levelsGlyph from "../assets/device/levels-a.svg";
 
 /* ------------------------------------------------------------------ status glyphs */
 
@@ -51,39 +53,49 @@ export function StatusBar({ h, light }: { h: number; light: boolean }) {
   );
 }
 
-/** iPhone DUO status cluster: time + wifi ring (lives in the Vertical Bar or the Reserved Region) */
-function DuoStatus({ light }: { light: boolean }) {
-  const c = light ? "#fff" : "#121826";
+/**
+ * iPhone DUO status UI, from the Figma "Pane controls" / "Reserved Region" components:
+ * camera (Dynamic Island 36), "9:41" (SF Pro Rounded Bold 16, w48) and the round Levels glyph (46).
+ */
+function DuoLevels({ light }: { light: boolean }) {
+  const url = `url("${levelsGlyph}")`;
   return (
-    <div className="duo-status" style={{ color: c }}>
-      <span className="duo-time">9:41</span>
-      <span className="duo-ring" style={{ borderColor: light ? "rgba(255,255,255,.55)" : "rgba(18,24,38,.35)" }}>
-        <Wifi c={c} size={15} />
-      </span>
+    <span
+      className="duo-levels"
+      style={{ backgroundColor: light ? "#fff" : "#000", WebkitMaskImage: url, maskImage: url }}
+    />
+  );
+}
+
+/** Vertical Bar (A outer portrait, C/D inner landscape): pt 29.33, pl 12, pr 24, gap 14 */
+function PaneControls({ light }: { light: boolean }) {
+  return (
+    <div className="pane">
+      <div className="pane-status">
+        <img className="duo-cam" src={duoCamera} alt="" width={36} height={36} />
+        <div className="pane-sb">
+          <span className="pane-pill" />
+          <span className="duo-time" style={{ color: light ? "#fff" : "#000" }}>
+            9:41
+          </span>
+          <DuoLevels light={light} />
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ chrome inside the screen */
 
-export function ScreenChrome({ s, light, posture, dim }: { s: ScreenSpec; light: boolean; posture?: string; dim?: boolean }) {
+export function ScreenChrome({ s, light, dim }: { s: ScreenSpec; light: boolean; posture?: string; dim?: boolean }) {
   return (
     <div className={`chrome ${dim ? "is-dim" : ""}`} aria-hidden>
       {s.kind !== "duo" && <StatusBar h={s.statusBar} light={light} />}
       {s.island && <div className="island" />}
       {s.notch && <div className="notch" />}
       {s.verticalBar && (
-        <div
-          className="vbar"
-          style={{ width: s.verticalBar.width, height: s.verticalBar.height }}
-        >
-          {posture !== "A" && <span className="cam" />}
-          <DuoStatus light={light} />
-          <span className="pane-ctl" style={{ top: s.verticalBar.height - 86 }}>
-            <i />
-            <i />
-            <i />
-          </span>
+        <div className="vbar" style={{ width: s.verticalBar.width, height: s.h }}>
+          <PaneControls light={light} />
         </div>
       )}
       {s.reserved && (
@@ -91,7 +103,12 @@ export function ScreenChrome({ s, light, posture, dim }: { s: ScreenSpec; light:
           className="reserved"
           style={{ left: s.reserved.x, top: s.reserved.y, width: s.reserved.w, height: s.reserved.h }}
         >
-          <DuoStatus light={light} />
+          <div className="reserved-sb">
+            <span className="duo-time" style={{ color: light ? "#fff" : "#000" }}>
+              9:41
+            </span>
+            <DuoLevels light={light} />
+          </div>
         </div>
       )}
       {s.crease && <div className={`crease is-${s.crease}`} />}

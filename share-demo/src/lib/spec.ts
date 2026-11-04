@@ -154,11 +154,12 @@ export function getShareLayout(s: ScreenSpec, bookSide: BookSide): ShareLayout {
     // book: left 8 → folding region edge (455.5 max); never crosses the fold
     panel =
       bookSide === "left"
-        ? { x: 8, w: region.w - 8, floating: true, bottomRadius: Math.max(20, s.radius - 8) }
-        : { x: region.x, w: region.w - 8, floating: true, bottomRadius: Math.max(20, s.radius - 8) };
+        ? { x: 8, w: region.w - 8, floating: true, bottomRadius: 0 }
+        : { x: region.x, w: region.w - 8, floating: true, bottomRadius: 0 };
   } else {
     const w = Math.min(SHEET_MAX, W - 16);
-    panel = { x: (W - w) / 2, w, floating: true, bottomRadius: Math.max(20, s.radius - 8) };
+    // Surface: only the top corners are rounded (Radius/XL 20); the screen's own corners clip the bottom.
+    panel = { x: (W - w) / 2, w, floating: true, bottomRadius: s.kind === "duo" ? 0 : Math.max(20, s.radius - 8) };
   }
 
   // Media (share image) horizontal rules

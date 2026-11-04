@@ -168,10 +168,7 @@
   pointer-events: none;
 }
 .chrome.is-dim .statusbar,
-.chrome.is-dim .duo-status {
-  opacity: 0.36;
-}
-
+.chrome.is-dim 
 .statusbar {
   position: absolute;
   top: 0;
@@ -231,67 +228,10 @@
   right: 0;
   transition: height 0.4s ease;
 }
-.vbar .cam {
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  width: 24px;
-  height: 24px;
-  margin-left: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #2f3a4f 0 18%, #07080a 45%);
-  box-shadow: 0 0 0 3px #000;
-}
-.duo-status {
-  position: absolute;
-  top: 58px;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.25s;
-}
-.duo-time {
-  font-size: 14px;
-  font-weight: 600;
-}
-.duo-ring {
-  width: 34px;
-  height: 34px;
-  border: 1.5px dashed;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-}
 .reserved {
   position: absolute;
 }
-.reserved .reserved .duo-status {
-  top: 24px;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
-}
-.pane-ctl {
-  position: absolute;
-  left: 50%;
-  width: 40px;
-  height: 16px;
-  margin-left: -20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.pane-ctl i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(130, 136, 150, 0.7);
-}
-.crease {
+.reserved .reserved .crease {
   position: absolute;
 }
 .crease.is-vertical {
@@ -327,7 +267,82 @@
   background: #121826;
 }
 
-/* A · outer: the mockup's own camera sits at the top of the Vertical Bar; status goes below it */
-.posture-A .vbar .duo-status {
-  top: 80px;
+.posture-A .vbar 
+/* iPhone DUO · Pane controls (Figma: Pane controls / Status bar / Levels) */
+.pane {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 29.33px 24px 24px 12px;
+}
+.pane-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.duo-cam {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 1000px;
+}
+.pane-sb {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 0 4px;
+}
+.pane-pill {
+  position: absolute;
+  inset: 42px -4px -8px -4px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.02);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+.duo-time {
+  position: relative;
+  width: 48px;
+  height: 19px;
+  font-family: "SF Pro Rounded", ui-rounded, "Inter Variable", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  transition: color 0.25s;
+}
+.duo-levels {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 46px;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color 0.25s;
+}
+/* Reserved Region (B · inner portrait): pt 24, pl 23 — time and Levels in a row */
+.reserved-sb {
+  position: absolute;
+  left: 23px;
+  top: 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reserved-sb .duo-levels {
+  width: 46px;
+  height: 46px;
+}
+.chrome.is-dim .pane-sb,
+.chrome.is-dim .reserved-sb {
+  opacity: 0.36;
 }
