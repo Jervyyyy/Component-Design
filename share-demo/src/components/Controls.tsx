@@ -291,12 +291,21 @@ export function Controls({
             ]}
           />
         </Field>
-        <div className="c-toggles">
+        <div className="c-slot">
+          <div className="c-slot-head">
+            <b>Slot 插槽 · 预设项</b>
+            <span>示意</span>
+          </div>
+          <p className="c-slot-note">以下模块为面板插槽的预设示例，仅演示位置与排布；实际内容需产线按业务自行拓展。</p>
+          <div className="c-toggles">
           <Toggle label="hasPromotion" sub="分享激励 Notice" value={cfg.hasPromotion} onChange={(v) => set("hasPromotion", v)} />
           <Toggle label="hasPreview" sub="分享内容预览" value={cfg.hasPreview} onChange={(v) => set("hasPreview", v)} />
           <Toggle label="hasPermission" sub="查看 / 编辑权限" value={cfg.hasPermission} onChange={(v) => set("hasPermission", v)} />
           <Toggle label="hasContacts" sub="站内联系人" value={cfg.hasContacts} onChange={(v) => set("hasContacts", v)} />
           <Toggle label="hasExtension" sub="隐私设置扩展" value={cfg.hasExtension} onChange={(v) => set("hasExtension", v)} />
+          </div>
+        </div>
+        <div className="c-toggles">
           <Toggle label="Share.Item disabled" sub="演示渠道不可用：去色 + 40%" value={cfg.disabledDemo} onChange={(v) => set("disabledDemo", v)} />
         </div>
       </Section>
