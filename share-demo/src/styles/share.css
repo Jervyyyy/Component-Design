@@ -873,3 +873,11 @@
   border-radius: 0 0 12px 12px;
   overflow: hidden;
 }
+
+/* corners belong to the image, not the viewport: once scrolled, the content is cut straight at the top */
+.media[data-type="scroll"] .media-scroll {
+  border-radius: 0;
+}
+.media[data-type="scroll"] .long {
+  border-radius: 12px;
+}
