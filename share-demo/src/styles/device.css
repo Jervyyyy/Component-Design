@@ -167,8 +167,9 @@
   z-index: 50;
   pointer-events: none;
 }
-.chrome.is-dim .statusbar,
-.chrome.is-dim 
+.chrome.is-dim .statusbar {
+  opacity: 0.36;
+}
 .statusbar {
   position: absolute;
   top: 0;
