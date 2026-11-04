@@ -68,7 +68,7 @@ function Row({
   panelW,
   count,
   overflow,
-  disabledId,
+  disabledIds,
   onClick,
 }: {
   ids: TargetId[];
@@ -77,7 +77,7 @@ function Row({
   /** longest row: every row follows the same rule so the columns line up */
   count: number;
   overflow: Config["overflow"];
-  disabledId?: TargetId;
+  disabledIds?: TargetId[];
   onClick: (id: TargetId) => void;
 }) {
   const ref = useDragScroll<HTMLDivElement>("x");
@@ -97,7 +97,7 @@ function Row({
           id={id}
           lang={lang}
           width={mode === "fixed" ? undefined : rule.itemW}
-          disabled={id === disabledId}
+          disabled={!!disabledIds?.includes(id)}
           onClick={onClick}
         />
       ))}
@@ -411,7 +411,13 @@ export function Share({ screen, layout, cfg, open, imageState, showBack, onClose
   const lang = cfg.lang;
   const { rows } = getRows(cfg.scenario, cfg.region, cfg.layout, cfg.hasMedia);
   const firstChannelIdx = rows[0].findIndex((id) => !isAction(id));
-  const disabledId = cfg.disabledDemo ? rows[0][Math.min(rows[0].length - 2, firstChannelIdx + 2)] : undefined;
+  // disabled demo: one channel and one action (action bar too), never "Share as image" / "More" so the flows stay usable
+  const allIds = rows.flat();
+  const actionIds = allIds.filter((id) => isAction(id) && id !== "shareImage" && id !== "more");
+  const disabledAction = actionIds.includes("editFriends") ? "editFriends" : actionIds[Math.min(1, actionIds.length - 1)];
+  const disabledIds: TargetId[] = cfg.disabledDemo
+    ? [rows[0][Math.min(rows[0].length - 2, firstChannelIdx + 2)], ...(disabledAction ? [disabledAction] : [])]
+    : [];
   const title = SCENARIOS[cfg.scenario].shareTitle[lang];
   const { panel, region } = layout;
 
@@ -467,7 +473,7 @@ export function Share({ screen, layout, cfg, open, imageState, showBack, onClose
                   panelW={panel.w}
                   count={Math.max(...rows.map((r) => r.length))}
                   overflow={cfg.overflow}
-                  disabledId={i === 0 ? disabledId : undefined}
+                  disabledIds={disabledIds}
                   onClick={onTarget}
                 />
               ))}

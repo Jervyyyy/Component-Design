@@ -306,7 +306,7 @@ export function Controls({
           </div>
         </div>
         <div className="c-toggles">
-          <Toggle label="Share.Item disabled" sub="演示渠道不可用：去色 + 40%" value={cfg.disabledDemo} onChange={(v) => set("disabledDemo", v)} />
+          <Toggle label="Share.Item disabled" sub="演示渠道与 Action 不可用：去色 + 40%" value={cfg.disabledDemo} onChange={(v) => set("disabledDemo", v)} />
         </div>
       </Section>
 
