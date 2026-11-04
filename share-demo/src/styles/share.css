@@ -242,7 +242,6 @@
   scroll-snap-align: center;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .carousel-card:not(.is-active) {
