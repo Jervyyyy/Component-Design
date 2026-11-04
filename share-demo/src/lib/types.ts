@@ -72,7 +72,7 @@ export const DEFAULT_CONFIG: Config = {
   hasIndicator: true,
   imageState: "ready",
 
-  layout: "doubleRow",
+  layout: "singleRow",
   overflow: "scroll",
   hasPromotion: false,
   hasPreview: false,
