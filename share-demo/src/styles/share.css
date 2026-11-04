@@ -838,3 +838,16 @@
 .prep.is-handoff {
   background: transparent;
 }
+
+/* type=scroll: the long image runs down behind the sheet — no gap above the panel.
+   It tucks 20 under the sheet's top radius; the fade + hint sit just above the sheet edge. */
+.media[data-type="scroll"] .media-area {
+  bottom: -20px;
+}
+.media[data-type="scroll"] .media-scroll {
+  border-radius: 12px 12px 0 0;
+}
+.media[data-type="scroll"] .media-fade {
+  height: 116px;
+  padding-bottom: 32px;
+}
