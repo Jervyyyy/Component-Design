@@ -162,8 +162,8 @@ export default function App() {
   const screen = getScreen(cfg);
   const layout = getShareLayout(screen, cfg.bookSide);
   const rows = getRows(cfg.scenario, cfg.region, cfg.layout, cfg.hasMedia).rows;
-  const firstRowCount = cfg.overflow === "fixed" ? Math.min(5, rows[0].length) : rows[0].length;
-  const rule = getItemRule(layout.panel.w, cfg.overflow, firstRowCount);
+  const rowCount = cfg.overflow === "fixed" ? Math.min(5, rows[0].length) : Math.max(...rows.map((r) => r.length));
+  const rule = getItemRule(layout.panel.w, cfg.overflow, rowCount);
   const imageState: ImageState = cfg.imageState !== "ready" ? cfg.imageState : mediaLoading ? "loading" : "ready";
 
   const insets: PageInsets = useMemo(() => {

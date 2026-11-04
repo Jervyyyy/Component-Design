@@ -66,6 +66,7 @@ function Row({
   ids,
   lang,
   panelW,
+  count,
   overflow,
   disabledId,
   onClick,
@@ -73,6 +74,8 @@ function Row({
   ids: TargetId[];
   lang: Lang;
   panelW: number;
+  /** longest row: every row follows the same rule so the columns line up */
+  count: number;
   overflow: Config["overflow"];
   disabledId?: TargetId;
   onClick: (id: TargetId) => void;
@@ -83,15 +86,17 @@ function Row({
     // fixed: max 5 per row — extra channels are removed from the slot (never hidden with opacity)
     list = ids.includes("more") ? [...ids.filter((i) => i !== "more").slice(0, 4), "more"] : ids.slice(0, 5);
   }
-  const rule = getItemRule(panelW, overflow, list.length);
+  const rule = getItemRule(panelW, overflow, overflow === "fixed" ? list.length : count);
+  // spread rows share one item width (from the longest row) so the columns of both rows line up
+  const mode = overflow === "fixed" ? "fixed" : rule.mode === "spread" ? "spread" : "scroll";
   return (
-    <div ref={ref} className={`row is-${overflow}`}>
+    <div ref={ref} className={`row is-${mode}`}>
       {list.map((id) => (
         <ShareItem
           key={id}
           id={id}
           lang={lang}
-          width={overflow === "scroll" ? rule.itemW : undefined}
+          width={mode === "fixed" ? undefined : rule.itemW}
           disabled={id === disabledId}
           onClick={onClick}
         />
@@ -460,6 +465,7 @@ export function Share({ screen, layout, cfg, open, imageState, showBack, onClose
                   ids={ids}
                   lang={lang}
                   panelW={panel.w}
+                  count={Math.max(...rows.map((r) => r.length))}
                   overflow={cfg.overflow}
                   disabledId={i === 0 ? disabledId : undefined}
                   onClick={onTarget}

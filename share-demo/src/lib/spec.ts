@@ -117,7 +117,7 @@ export function getScreen(c: Config): ScreenSpec {
 
 export interface ItemRule {
   /** how the item width is derived */
-  mode: "fixed" | "peek" | "min72";
+  mode: "fixed" | "peek" | "min72" | "spread";
   itemW: number;
   /** human readable rule for the readout */
   rule: string;
@@ -195,8 +195,14 @@ export function getItemRule(panelW: number, overflow: "fixed" | "scroll", count:
     const itemW = Math.max(72, (inner - 8 * (n - 1)) / n);
     return { mode: "fixed", itemW, rule: `fixed · 一行最多 5 个，平分宽度 (${n} 个)`, visible: n };
   }
+  // scroll: when every item already fits at its scroll width, nothing overflows — share the row equally instead
+  const scrollW = panelW <= 440 ? (panelW - 52) / 4.5 : 72;
+  if (count > 0 && count * scrollW + (count - 1) * 8 <= inner) {
+    const itemW = (inner - 8 * (count - 1)) / count;
+    return { mode: "spread", itemW, rule: `scroll · 未超出宽度时平分 (${count} 个)`, visible: count };
+  }
   if (panelW <= 440) {
-    const itemW = (panelW - 52) / 4.5;
+    const itemW = scrollW;
     return { mode: "peek", itemW, rule: "W ≤ 440 · 露出 4.5，Item = (W − 52) ÷ 4.5", visible: 4.5 };
   }
   const fit = Math.floor((inner + 8) / 80);
