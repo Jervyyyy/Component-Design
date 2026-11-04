@@ -105,7 +105,6 @@
   width: 3px;
   height: 64px;
 }
-.posture-A .posture-D 
 /* custom resize handles */
 .rz {
   position: absolute;
@@ -268,7 +267,6 @@
   background: #121826;
 }
 
-.posture-A .vbar 
 /* iPhone DUO · Pane controls (Figma: Pane controls / Status bar / Levels) */
 .pane {
   position: absolute;
