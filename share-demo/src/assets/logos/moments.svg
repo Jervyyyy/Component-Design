@@ -1,0 +1,20 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id=".Share.Logo" clip-path="url(#clip0_0_60)">
+<path id="Bg" d="M55.5 28C55.5 43.1878 43.1878 55.5 28 55.5C12.8122 55.5 0.5 43.1878 0.5 28C0.5 12.8122 12.8122 0.5 28 0.5C43.1878 0.5 55.5 12.8122 55.5 28Z" fill="white" stroke="#E6E8EB"/>
+<g id="Mark">
+<path id="Blade 1" d="M29.99 23.1963L32.804 26.0103L42.559 35.7653C43.5786 33.8534 44.2117 31.7593 44.4221 29.6027C44.6324 27.4461 44.4159 25.2692 43.785 23.1963H29.99Z" fill="#446CE1" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 2" d="M32.804 26.0098V29.9898V43.7848C34.8769 43.154 36.8053 42.121 38.4791 40.745C40.1529 39.3689 41.5392 37.6766 42.5589 35.7648L32.804 26.0098Z" fill="#349BE8" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 3" d="M32.804 29.9902L29.99 32.8042L20.235 42.5592C22.1469 43.5789 24.241 44.212 26.3975 44.4223C28.5541 44.6327 30.7311 44.4162 32.804 43.7852V29.9902Z" fill="#5CB923" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 4" d="M29.99 32.8037H26.01H12.215C12.8458 34.8767 13.8787 36.8051 15.2548 38.4788C16.6308 40.1526 18.3231 41.5389 20.235 42.5587L29.99 32.8037Z" fill="#87BC2A" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 5" d="M26.01 32.8043L23.196 29.9903L13.441 20.2353C12.4214 22.1473 11.7883 24.2413 11.5779 26.3979C11.3676 28.5545 11.5841 30.7314 12.215 32.8043H26.01Z" fill="#DEAF26" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 6" d="M23.196 29.9898V26.0098V12.2148C21.1231 12.8456 19.1947 13.8786 17.5209 15.2546C15.8471 16.6307 14.4608 18.323 13.441 20.2348L23.196 29.9898Z" fill="#E16219" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 7" d="M23.196 26.01L26.01 23.196L35.765 13.441C33.8531 12.4214 31.7591 11.7883 29.6025 11.5779C27.4459 11.3676 25.269 11.5841 23.196 12.215V26.01Z" fill="#E14441" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+<path id="Blade 8" d="M26.01 23.1959H29.99H43.785C43.1542 21.123 42.1213 19.1945 40.7452 17.5208C39.3691 15.847 37.6769 14.4607 35.765 13.4409L26.01 23.1959Z" fill="#5252DA" stroke-width="1.4" stroke-linejoin="round" stroke="white"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_60">
+<rect width="56" height="56" fill="white"/>
+</clipPath>
+</defs>
+</svg>

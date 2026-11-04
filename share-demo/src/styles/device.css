@@ -1,0 +1,347 @@
+/* ============================================================================
+   Device frames + system chrome
+   ========================================================================== */
+
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  background: #0b0b0d;
+  box-shadow:
+    0 0 0 2px #3b3b40,
+    0 0 0 3px #1c1c1f,
+    0 40px 80px -20px rgba(17, 24, 39, 0.35),
+    0 12px 28px rgba(17, 24, 39, 0.18);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s;
+}
+.frame.kind-duo {
+  background: #0d0d0f;
+  box-shadow:
+    0 0 0 2px #c9c2b1,
+    0 0 0 4px #9d978a,
+    0 0 0 5px #6f6a60,
+    0 40px 80px -20px rgba(17, 24, 39, 0.35),
+    0 12px 28px rgba(17, 24, 39, 0.18);
+}
+.frame.kind-custom {
+  background: #16171a;
+  box-shadow:
+    0 0 0 1px #2f3036,
+    0 30px 60px -20px rgba(17, 24, 39, 0.3),
+    0 8px 20px rgba(17, 24, 39, 0.14);
+}
+.frame.kind-custom .btn {
+  display: none;
+}
+
+.screen {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s;
+}
+
+/* iPhone DUO: Figma mockup image over a screen clipped to its cut-out */
+.frame-mock {
+  position: relative;
+  flex: none;
+  filter: drop-shadow(0 24px 40px rgba(17, 24, 39, 0.22)) drop-shadow(0 6px 12px rgba(17, 24, 39, 0.12));
+}
+.frame-mock .screen {
+  border-radius: 0;
+  transition: none;
+}
+.mock-img {
+  position: absolute;
+  z-index: 60;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* hardware buttons */
+.btn {
+  position: absolute;
+  background: linear-gradient(90deg, #2c2c30, #4a4a50);
+  border-radius: 2px;
+}
+.kind-iphone .btn-a {
+  left: -5px;
+  top: 22%;
+  width: 3px;
+  height: 56px;
+}
+.kind-iphone .btn-b {
+  left: -5px;
+  top: calc(22% + 70px);
+  width: 3px;
+  height: 56px;
+}
+.kind-iphone .btn-c {
+  right: -5px;
+  top: 28%;
+  width: 3px;
+  height: 90px;
+}
+.kind-duo .btn {
+  background: linear-gradient(180deg, #d8d2c3, #9d978a);
+}
+.kind-duo .btn-a {
+  top: -6px;
+  left: 18%;
+  width: 52px;
+  height: 3px;
+}
+.kind-duo .btn-b {
+  top: -6px;
+  left: calc(18% + 64px);
+  width: 52px;
+  height: 3px;
+}
+.kind-duo .btn-c {
+  right: -6px;
+  top: 30%;
+  width: 3px;
+  height: 64px;
+}
+/* custom resize handles */
+.rz {
+  position: absolute;
+  z-index: 5;
+  touch-action: none;
+}
+.rz-x {
+  right: -18px;
+  top: 50%;
+  width: 8px;
+  height: 64px;
+  margin-top: -32px;
+  border-radius: 4px;
+  background: #b9bec9;
+  cursor: ew-resize;
+}
+.rz-y {
+  bottom: -18px;
+  left: 50%;
+  width: 64px;
+  height: 8px;
+  margin-left: -32px;
+  border-radius: 4px;
+  background: #b9bec9;
+  cursor: ns-resize;
+}
+.rz-xy {
+  right: -22px;
+  bottom: -22px;
+  width: 18px;
+  height: 18px;
+  border-right: 3px solid #3264ff;
+  border-bottom: 3px solid #3264ff;
+  border-radius: 0 0 6px 0;
+  cursor: nwse-resize;
+}
+.rz:hover {
+  background-color: #3264ff;
+}
+.rz-xy:hover {
+  background: rgba(50, 100, 255, 0.12);
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.app-window {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #f6f7fa;
+  transition: right 0.4s ease;
+}
+
+.chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+.chrome.is-dim .statusbar {
+  opacity: 0.36;
+}
+.statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px 6px 48px;
+  transition: color 0.25s;
+}
+.kind-custom .statusbar {
+  padding: 0 18px;
+}
+.sb-time {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.kind-custom .sb-time {
+  font-size: 13px;
+}
+.sb-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kind-custom .sb-icons {
+  transform: scale(0.8);
+  transform-origin: right center;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 124px;
+  height: 36px;
+  margin-left: -62px;
+  border-radius: 20px;
+  background: #000;
+}
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 162px;
+  height: 32px;
+  margin-left: -81px;
+  border-radius: 0 0 20px 20px;
+  background: #000;
+}
+
+.vbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: height 0.4s ease;
+}
+.reserved {
+  position: absolute;
+}
+.reserved .reserved .crease {
+  position: absolute;
+}
+.crease.is-vertical {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  margin-left: -1.5px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.03));
+}
+.crease.is-horizontal {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.03));
+}
+.fold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.02));
+}
+.home-ind {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  margin-left: -67px;
+  border-radius: 3px;
+  background: #121826;
+}
+
+/* iPhone DUO · Pane controls (Figma: Pane controls / Status bar / Levels) */
+.pane {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 29.33px 24px 24px 12px;
+}
+.pane-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.duo-cam {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 1000px;
+}
+.pane-sb {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 0 4px;
+}
+.pane-pill {
+  position: absolute;
+  inset: 42px -4px -8px -4px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.02);
+  -webkit-backdrop-filter: blur(12.5px);
+  backdrop-filter: blur(12.5px);
+}
+.duo-time {
+  position: relative;
+  width: 48px;
+  height: 19px;
+  font-family: "SF Pro Rounded", ui-rounded, "Inter Variable", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  transition: color 0.25s;
+}
+.duo-levels {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 46px;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color 0.25s;
+}
+/* Reserved Region (B · inner portrait): pt 24, pl 23 — time and Levels in a row */
+.reserved-sb {
+  position: absolute;
+  left: 23px;
+  top: 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reserved-sb .duo-levels {
+  width: 46px;
+  height: 46px;
+}
+.chrome.is-dim .pane-sb,
+.chrome.is-dim .reserved-sb {
+  opacity: 0.36;
+}
