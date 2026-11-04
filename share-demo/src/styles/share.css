@@ -860,3 +860,16 @@
 .media {
   z-index: 1;
 }
+
+/* type=scroll: while scrolling the image runs under the sheet; at the very end it stops 16 above it.
+   (area extends 20 under the sheet → 20 + 16 of transparent end padding) */
+.media[data-type="scroll"] .media-scroll {
+  background: transparent;
+}
+.media[data-type="scroll"] .media-scroll-content {
+  padding-bottom: 36px;
+}
+.media[data-type="scroll"] .long {
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}

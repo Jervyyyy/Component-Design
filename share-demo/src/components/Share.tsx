@@ -261,7 +261,7 @@ function ScrollMedia({ cfg, layout, lang }: { cfg: Config; layout: ShareLayout; 
           progress.current = el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight);
         }}
       >
-        <div ref={content}>
+        <div ref={content} className="media-scroll-content">
           <LongImage scenario={cfg.scenario} />
         </div>
       </div>
