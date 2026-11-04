@@ -228,6 +228,8 @@ function ScrollMedia({ cfg, layout, lang }: { cfg: Config; layout: ShareLayout; 
   const progress = useRef(0);
   const lastResize = useRef(0);
   const [scrolled, setScrolled] = useState(false);
+  // Large windows: when the whole long image fits above the sheet, centre it and drop the scroll hint.
+  const [fits, setFits] = useState(false);
   useEffect(() => {
     setScrolled(false);
     progress.current = 0;
@@ -239,6 +241,9 @@ function ScrollMedia({ cfg, layout, lang }: { cfg: Config; layout: ShareLayout; 
     if (!el || !c) return;
     const ro = new ResizeObserver(() => {
       lastResize.current = performance.now();
+      const img = c.firstElementChild as HTMLElement | null;
+      // visible height = viewport minus the 20 tucked under the sheet; keep 16 clear above the sheet
+      setFits(!!img && img.offsetHeight + 16 + 20 <= el.clientHeight);
       el.scrollTop = progress.current * Math.max(0, el.scrollHeight - el.clientHeight);
     });
     ro.observe(c);
@@ -247,7 +252,7 @@ function ScrollMedia({ cfg, layout, lang }: { cfg: Config; layout: ShareLayout; 
   }, [ref]);
   return (
     <div
-      className="media-scroll"
+      className={`media-scroll ${fits ? "is-fit" : ""}`}
       style={{ left: layout.media.x - layout.region.x, width: layout.media.w }}
     >
       <div
@@ -265,7 +270,7 @@ function ScrollMedia({ cfg, layout, lang }: { cfg: Config; layout: ShareLayout; 
           <LongImage scenario={cfg.scenario} />
         </div>
       </div>
-      <div className={`media-fade ${scrolled ? "is-hidden" : ""}`}>
+      <div className={`media-fade ${scrolled || fits ? "is-hidden" : ""}`}>
         <span>{t("scrollHint", lang)}</span>
       </div>
     </div>
