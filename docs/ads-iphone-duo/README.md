@@ -20,7 +20,7 @@
 - 颜色、间距、圆角、描边都绑定 TDS 变量；文字都用 TDS 文本样式；投影使用 `Shadow/Default`、`Shadow/Enhanced`。
 - 所有容器都是 Auto Layout。只有覆盖层（蒙层、悬浮按钮、导航叠在头图上、标注线）使用绝对定位。
 - 检查结果：新页面中 Auto Layout 以外的 frame 0 个，未绑定变量的颜色 / 间距 0 处，未套文本样式的文字 0 处。
-- 广告素材原图带有红色批注，所以全部改成可编辑的图层重建。酒店图片是从文档截图里裁出的干净内容图。
+- 广告素材的文案、按钮都是可编辑图层，底图换成了内容相近的免费授权实拍图，叠加一层绑定 `Bg/Scrim` 的遮罩，保证白字可读。酒店列表图是从文档截图里裁出的干净内容图。
 
 ## 机型参数
 
@@ -76,6 +76,30 @@
 ### G 图标 / 文字通知：只改布局
 
 图标保持 32×32，文案区宽度随容器拉伸，超过两行截断。
+
+## 图片来源
+
+设计稿里的示意图片来自 [Openverse](https://openverse.org/)（Flickr 上 CC BY / CC0 授权的照片），只用于设计稿示意，上线素材仍由运营提供。按 CC BY 要求注明作者和出处：
+
+| 位置 | 图片 | 作者 | 授权 |
+|---|---|---|---|
+| P1 头图 807、③A、② A 缩略图 | [Sunset Hong Kong](https://www.flickr.com/photos/29418416@N08/14599570053) | Studio Incendo | CC BY 2.0 |
+| P1 卡片 Banner 711 | [Suitcase artwork](https://www.flickr.com/photos/57868312@N00/8996166797) | Matt From London | CC BY 2.0 |
+| P2 顶部大图（内容图） | [Jade Dragon Snow Mountain](https://www.flickr.com/photos/37508546@N07/4588998912) | Kain Kalju | CC BY 2.0 |
+| P2 卡片 Banner 10000860、③B、② B 缩略图 | [Giant Panda](https://www.flickr.com/photos/12587661@N06/11502320753) | Michael Gwyther-Jones | CC BY 2.0 |
+| P3 酒店卡片 | [Shanghai Bund](https://www.flickr.com/photos/70889483@N00/5480866364) | trioptikmal | CC BY 2.0 |
+| P3 Deals「Double Reward」、③C、② C 缩略图 | [On the airplane](https://www.flickr.com/photos/40422902@N00/10720103175) | skyseeker | CC BY 2.0 |
+| P3 Deals「Thai Airways Payday」、③C | [Wat Arun Bangkok.](https://www.flickr.com/photos/88123769@N02/48047658306) | Bernard Spragg | CC0 1.0 |
+| P4 Deals、P6 信息流 738、③C/③D、② D 缩略图 | [Petronas Towers Skyline Kuala Lumpur #IPhone6s #dailyshoot](https://www.flickr.com/photos/46018453@N06/23937462761) | Leshaines123 | CC BY 2.0 |
+| P4 Deals 第 2 张、③C | [Panorama of tropical beach](https://www.flickr.com/photos/53355131@N07/4973140074) | victoria white2010 | CC BY 2.0 |
+| P5 弹窗 714、③E、② E 缩略图 | [Tokyo Bay Area - Tokyo night view](https://www.flickr.com/photos/9004977@N04/12482206173) | oisa | CC BY 2.0 |
+| P6 信息流 740、③D、② D 缩略图 | [Marina Bay, Singapore](https://www.flickr.com/photos/66239816@N08/22324973030) | ^Joe | CC BY 2.0 |
+| P6 内容卡（上海） | [Shanghai Skyline](https://www.flickr.com/photos/37398884@N03/16363177946) | gags9999 | CC BY 2.0 |
+| P6 内容卡（清迈） | [Chiang Mai Temple](https://www.flickr.com/photos/34073237@N04/3343844179) | Christian Haugen | CC BY 2.0 |
+| P7 S Banner 10000250 | [Tokyo Night 2](https://www.flickr.com/photos/19594487@N00/39762107) | machu. | CC BY 2.0 |
+| P7 信息流（JP） | [cherry blossom japan](https://www.flickr.com/photos/7274020@N06/5561573496) | Fotois.com / Dmaniax.com / 246g.com | CC BY 2.0 |
+| P7 内容卡（大阪餐厅） | [Sushi and sashimi at Izakaya Mizu](https://www.flickr.com/photos/34948727@N00/8104669952) | ultrakml | CC BY 2.0 |
+| ③F 开屏、② F 缩略图 | [mountain lake landscape](https://www.flickr.com/photos/25106463@N00/52841907928) | Tysto | CC BY 2.0 |
 
 ## 待确认
 
