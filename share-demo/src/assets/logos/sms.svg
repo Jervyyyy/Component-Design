@@ -1,0 +1,18 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id=".Share.Logo" clip-path="url(#clip0_0_176)">
+<g id="Bg">
+<circle cx="28" cy="28" r="28" fill="#34C759"/>
+<circle cx="28" cy="28" r="28" fill="url(#paint0_linear_0_176)"/>
+</g>
+<path id="message" d="M28 40.25C36.8366 40.25 44 34.3737 44 27.125C44 19.8763 36.8366 14 28 14C19.1634 14 12 19.8763 12 27.125C12 31.7196 14.878 35.7628 19.2359 38.1077C19.09 39.2747 18.6515 40.8322 17.3333 42C19.826 41.5583 21.8154 40.6708 23.3015 39.675C24.7872 40.0488 26.3649 40.25 28 40.25Z" fill="white"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_176" x1="28" y1="0" x2="28" y2="56" gradientUnits="userSpaceOnUse">
+<stop stop-color="#5AF575"/>
+<stop offset="1" stop-color="#13BD2C"/>
+</linearGradient>
+<clipPath id="clip0_0_176">
+<rect width="56" height="56" fill="white"/>
+</clipPath>
+</defs>
+</svg>

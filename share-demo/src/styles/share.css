@@ -1,0 +1,906 @@
+/* ============================================================================
+   Share — tokens from TDS 2026 (Figma: Share / Share.Panel / Share.Item / .Share.Media)
+   ========================================================================== */
+
+.screen {
+  --text-primary: #121826; /* smtcColorTextPrimary */
+  --text-secondary: #4f5563; /* smtcColorTextSecondary */
+  --text-tertiary: #8592a6;
+  --text-disable: #c3c7cf; /* Text (Icon)/Disable */
+  --bg-surface: #ffffff; /* smtcColorBgSurface */
+  --bg-container: #f6f7fa; /* smtcColorBgContainer */
+  --bg-container-active: #e9ebf0; /* Bg/ContainerActive */
+  --border-default: rgba(212, 215, 222, 0.8); /* smtcColorBorderDefault */
+  --scrim: rgba(0, 0, 0, 0.64); /* smtcColorBgScrim #000000A3 */
+  --brand: #3264ff;
+  --shadow-over: 0 0 2px rgba(7, 20, 60, 0.16), 0 -4px 12px rgba(7, 20, 60, 0.08); /* Shadow/Default_Over */
+  font-family: "Inter Variable", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-feature-settings: "case" 1, "cv03" 1, "cv04" 1, "cv05" 1, "cv14" 1;
+  color: var(--text-primary);
+}
+
+.share {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.share.is-open {
+  pointer-events: auto;
+}
+
+.share-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.share.has-media .share-scrim {
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  transition: opacity 0.28s ease, backdrop-filter 0.45s ease-out, -webkit-backdrop-filter 0.45s ease-out;
+}
+.share.has-media.is-open .share-scrim {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.share.is-open .share-scrim {
+  opacity: 1;
+}
+
+.share-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: left 0.4s ease, width 0.4s ease;
+}
+.share-spacer {
+  flex: 1 1 0;
+}
+
+/* ---------------------------------------------------------------- NavigationBar (hasMedia) */
+
+.share-nav {
+  position: relative;
+  flex: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.share.is-open .share-nav {
+  opacity: 1;
+}
+.share-navrow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.navbtn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.navtitle {
+  min-width: 0;
+  color: #fff; /* coreColorNeutralWhite */
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* bar phones: the title is centred on the bar, clear of the icon on both sides */
+.share-navrow.is-center .navtitle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2 * (var(--nav-pad, 16px) + 24px + 12px));
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- .Share.Media */
+
+.media {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.08s;
+}
+.share.is-open .media {
+  opacity: 1;
+}
+/* recording: when generation finishes the image fades in where it sits (~250ms) */
+.media-scroll,
+.media-fit,
+.media-carousel,
+.media-status {
+  animation: media-in 0.25s ease-out both;
+}
+@keyframes media-in {
+  from {
+    opacity: 0;
+  }
+}
+.media-area {
+  position: absolute;
+  inset: 16px 0 16px 0; /* Space/M 16 below the title bar, 16 above the sheet */
+}
+
+.media-statuswrap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+}
+.media-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.64);
+  background: none;
+  border: 0;
+}
+.media-status.is-error {
+  cursor: pointer;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(18, 24, 38, 0.12);
+  border-top-color: var(--brand);
+  animation: spin 0.8s linear infinite;
+}
+.spinner.light {
+  border-color: rgba(255, 255, 255, 0.22);
+  border-top-color: rgba(255, 255, 255, 0.85);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* type=scroll */
+.media-scroll {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: left 0.4s ease, width 0.4s ease;
+}
+.media-scroll-inner {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.media-scroll-inner::-webkit-scrollbar {
+  display: none;
+}
+.media-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 96px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0.72) 100%);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.media-fade.is-hidden {
+  opacity: 0;
+}
+
+/* type=fit */
+.media-fit {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 8px; /* Radius/M */
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  transition: all 0.4s ease;
+}
+
+/* type=carousel */
+.media-carousel {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.carousel-card {
+  flex: none;
+  scroll-snap-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.carousel-card:not(.is-active) {
+  transform: scale(0.96);
+  opacity: 0.86;
+}
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+.dots button {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.2s, width 0.2s;
+}
+.dots button.on {
+  background: #fff;
+}
+
+.is-dragging {
+  scroll-snap-type: none !important;
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- Surface (Sheet) */
+
+.surface-wrap {
+  flex: none;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease-out, margin-left 0.4s ease, width 0.4s ease;
+}
+.share.is-open .surface-wrap {
+  opacity: 1;
+  transform: none;
+}
+.surface {
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-over);
+  overflow: hidden;
+}
+
+.head {
+  position: relative;
+  padding: 12px 52px 0; /* Space/S */
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.head-title {
+  font-size: 16px; /* Body Emphasized/L */
+  font-weight: 500;
+  line-height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.head-close {
+  position: absolute;
+  left: 16px;
+  top: 20px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- Share.Panel */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Space/L */
+  padding: 12px 0; /* Space/S */
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0 20px;
+}
+.row.is-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+}
+.row.is-scroll::-webkit-scrollbar {
+  display: none;
+}
+.row.is-scroll::after {
+  content: "";
+  flex: none;
+  width: 12px; /* 20 right padding − 8 gap */
+}
+.row.is-fixed .item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- Share.Item */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px; /* Space/XS */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.item-icon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.item.is-action .item-icon {
+  background: var(--bg-container);
+  border-radius: 999px;
+}
+/* pressed: icon 56 → 52, label stays; action Bg/Container → Bg/ContainerActive */
+.item:not(.is-disabled):active .item-icon {
+  transform: scale(0.9286);
+}
+.item.is-action:not(.is-disabled):active .item-icon {
+  background: var(--bg-container-active);
+}
+.item-label {
+  width: 100%;
+  font-size: 12px; /* Body/S */
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.item.is-disabled {
+  cursor: not-allowed;
+}
+.item.is-disabled .item-label {
+  color: var(--text-disable);
+}
+.item.is-disabled.is-channel .item-icon {
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+
+.logo {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+}
+.logo img {
+  display: block;
+  max-width: none;
+}
+.logo-messenger {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+}
+
+/* ---------------------------------------------------------------- Panel modules */
+
+.mod {
+  margin: 0 20px;
+}
+.mod-promo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #fff3e6 0%, #fff8f1 100%);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.mod-promo p {
+  margin: 0;
+  flex: 1;
+}
+.mod-promo .coin {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffb000, #ff7a00);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.mod-promo .chev {
+  color: var(--text-tertiary);
+  font-size: 18px;
+}
+
+.mod-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-container);
+}
+.mod-preview img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: none;
+}
+.mod-preview div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mod-preview b {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mod-preview span {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.mod-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 40px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--bg-container);
+}
+.seg-thumb {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(7, 20, 60, 0.12);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mod-seg button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.mod-seg button.on {
+  color: var(--text-primary);
+}
+
+.mod-caption {
+  margin: 0 20px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mod-ext {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #eef0f4;
+}
+.mod-ext div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mod-ext b {
+  font-size: 14px;
+  font-weight: 500;
+}
+.mod-ext span {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: #d4d7de;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.switch i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+.switch.on {
+  background: var(--brand);
+}
+.switch.on i {
+  transform: translateX(18px);
+}
+
+/* ---------------------------------------------------------------- Preparing / Loading card */
+
+.prep {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.17s ease-out;
+}
+.prep.is-on {
+  transition: none; /* recording: scrim + card cut in on the tap */
+  opacity: 1;
+  pointer-events: auto;
+}
+.prep-card {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; /* Space/M */
+  transition: left 0.4s ease;
+}
+.prep-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px; /* Radius/M */
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+.prep-x {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.prep-text {
+  color: #fff;
+  font-size: 14px; /* Body/M */
+  line-height: 1.5;
+}
+/* Loading mark — draw-on motion from the reference recording (≈0.85s draw, then hold; loops while loading) */
+.lmark {
+  display: block;
+  overflow: visible;
+  --cycle: 1.6s;
+}
+.lmark > * {
+  animation-duration: var(--cycle);
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.lmark-body {
+  animation-name: lmark-settle;
+  transform-origin: 12px 12px;
+}
+.lmark-mtn {
+  stroke-dasharray: 1;
+  animation: lmark-draw var(--cycle) infinite;
+}
+.lmark-sun {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: lmark-sun;
+}
+.lmark-l1,
+.lmark-l2 {
+  stroke-dasharray: 1;
+}
+.lmark-l1 {
+  animation-name: lmark-l1;
+}
+.lmark-l2 {
+  animation-name: lmark-l2;
+}
+@keyframes lmark-settle {
+  0% {
+    transform: translate(-4px, 3px);
+  }
+  38% {
+    transform: translate(0, 0);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes lmark-draw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.35, 0, 0.25, 1);
+  }
+  53% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes lmark-sun {
+  0% {
+    transform: translate(-14px, 8px) scale(0.12);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  20% {
+    transform: translate(-12px, 4px) scale(0.6);
+  }
+  34% {
+    transform: translate(-3px, 0.5px) scale(0.95);
+  }
+  42% {
+    transform: none;
+  }
+  88% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 0;
+  }
+}
+/* horizon lines: each half is its own path drawn from the centre */
+@keyframes lmark-l1 {
+  0%,
+  33% {
+    stroke-dashoffset: 1;
+    animation-timing-function: ease-out;
+  }
+  46% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes lmark-l2 {
+  0%,
+  40% {
+    stroke-dashoffset: 1;
+    animation-timing-function: ease-out;
+  }
+  53% {
+    stroke-dashoffset: 0;
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+/* iOS-style activity indicator used for Image · state=loading */
+.petals {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+.petals i {
+  position: absolute;
+  left: 11px;
+  top: 0;
+  width: 2px;
+  height: 7px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  transform-origin: 1px 12px;
+  animation: petal 0.8s linear infinite;
+}
+@keyframes petal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.18;
+  }
+}
+
+/* ---------------------------------------------------------------- Toast */
+
+.toast {
+  position: absolute;
+  top: 50%;
+  z-index: 40;
+  max-width: 70%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(18, 24, 38, 0.9);
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: toast-in 0.2s ease;
+  pointer-events: none;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+}
+
+/* Loading card → sheet hand-off: scrim opacity stays constant; only the card fades and the blur builds */
+.share.is-handoff .share-scrim {
+  transition: backdrop-filter 0.45s ease-out, -webkit-backdrop-filter 0.45s ease-out;
+}
+.prep.is-handoff {
+  background: transparent;
+}
+
+/* type=scroll: the long image runs down behind the sheet — no gap above the panel.
+   It tucks 20 under the sheet's top radius; the fade + hint sit just above the sheet edge. */
+.media[data-type="scroll"] .media-area {
+  bottom: -20px;
+}
+.media[data-type="scroll"] .media-scroll {
+  border-radius: 12px 12px 0 0;
+}
+.media[data-type="scroll"] .media-fade {
+  height: 116px;
+  padding-bottom: 32px;
+}
+
+/* the sheet always paints above the preview (the long image tucks under its rounded top) */
+.surface-wrap {
+  position: relative;
+  z-index: 2;
+}
+.media {
+  z-index: 1;
+}
+
+/* type=scroll: while scrolling the image runs under the sheet; at the very end it stops 16 above it.
+   (area extends 20 under the sheet → 20 + 16 of transparent end padding) */
+.media[data-type="scroll"] .media-scroll {
+  background: transparent;
+}
+.media[data-type="scroll"] .media-scroll-content {
+  padding-bottom: 36px;
+}
+.media[data-type="scroll"] .long {
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+/* corners belong to the image, not the viewport: once scrolled, the content is cut straight at the top */
+.media[data-type="scroll"] .media-scroll {
+  border-radius: 0;
+}
+.media[data-type="scroll"] .long {
+  border-radius: 12px;
+}
+
+/* long image shorter than the space: centred vertically in the visible area, no scroll, no hint */
+.media[data-type="scroll"] .media-scroll.is-fit .media-scroll-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 20px; /* centre above the sheet edge, not under it */
+  overflow: hidden;
+  cursor: default;
+}
+.media[data-type="scroll"] .media-scroll.is-fit .media-scroll-content {
+  padding-bottom: 0;
+}
