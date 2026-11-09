@@ -93,11 +93,22 @@
   place-items: center;
 }
 .navtitle {
+  min-width: 0;
   color: #fff; /* coreColorNeutralWhite */
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* bar phones: the title is centred on the bar, clear of the icon on both sides */
+.share-navrow.is-center .navtitle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2 * (var(--nav-pad, 16px) + 24px + 12px));
+  text-align: center;
 }
 
 /* ---------------------------------------------------------------- .Share.Media */

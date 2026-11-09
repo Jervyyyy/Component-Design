@@ -428,8 +428,14 @@ export function Share({ screen, layout, cfg, open, imageState, showBack, onClose
         {cfg.hasMedia && (
           <div className="share-nav" style={{ height: screen.navBar }}>
             <div
-              className="share-navrow"
-              style={{ top: screen.kind === "duo" ? 20 : screen.navBar - 44, paddingLeft: layout.navPadLeft }}
+              // bar phones / resizable windows: title centred; iPhone DUO: title follows the icon on the left
+              className={`share-navrow ${screen.kind === "duo" ? "is-start" : "is-center"}`}
+              style={{
+                top: screen.kind === "duo" ? 20 : screen.navBar - 44,
+                paddingLeft: layout.navPadLeft,
+                paddingRight: layout.navPadLeft,
+                ["--nav-pad" as string]: `${layout.navPadLeft}px`,
+              }}
             >
               <button type="button" className="navbtn" onClick={showBack ? onBack : onClose} aria-label={showBack ? "Back" : "Close"}>
                 <Icon name={showBack ? "arrowLeft" : "close"} size={24} color="#fff" />
